@@ -1,31 +1,56 @@
 <section class="empty">
-  <div class="badge">
-    <mat-icon aria-hidden="true">key</mat-icon>
-  </div>
-  <h2>Bring your own Gemini API key to get started</h2>
-  <p>
-    Dynamic Event Architect runs entirely in your browser. Paste a Gemini API
-    key once and it stays in <code>localStorage</code> on this device only — no
-    backend, no shared key, no analytics.
-  </p>
-  <div class="actions">
-    <button
-      mat-flat-button
-      color="primary"
-      (click)="open()"
-      class="connect-cta"
-    >
-      <mat-icon>link</mat-icon>
-      Connect your Gemini API key
-    </button>
-    <a
-      href="https://aistudio.google.com/apikey"
-      target="_blank"
-      rel="noopener"
-      class="studio-link"
-    >
-      Get a free key at Google AI Studio
-      <mat-icon aria-hidden="true">open_in_new</mat-icon>
-    </a>
+  <div class="empty-card">
+    <div class="aurora" aria-hidden="true"></div>
+
+    <div class="badge" aria-hidden="true">
+      <mat-icon>key</mat-icon>
+    </div>
+
+    <h2>
+      Bring your own
+      <span class="brand-gradient">Gemini API key</span>
+      to get started
+    </h2>
+    <p>
+      Maestro runs entirely in your browser. Paste a Gemini API key once and it
+      stays in <code>localStorage</code> on this device only — no backend, no
+      shared key, no analytics.
+    </p>
+
+    <div class="features">
+      <div class="feature">
+        <mat-icon aria-hidden="true">shield_lock</mat-icon>
+        <span>BYOK · stays in your browser</span>
+      </div>
+      <div class="feature">
+        <mat-icon aria-hidden="true">groups</mat-icon>
+        <span>5 collaborating Gemini agents</span>
+      </div>
+      <div class="feature">
+        <mat-icon aria-hidden="true">link</mat-icon>
+        <span>Grounded with Google Search</span>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button
+        mat-flat-button
+        color="primary"
+        (click)="open()"
+        class="connect-cta"
+      >
+        <mat-icon>link</mat-icon>
+        Connect your Gemini API key
+      </button>
+      <a
+        href="https://aistudio.google.com/apikey"
+        target="_blank"
+        rel="noopener"
+        class="studio-link"
+      >
+        Get a free key at Google AI Studio
+        <mat-icon aria-hidden="true">open_in_new</mat-icon>
+      </a>
+    </div>
   </div>
 </section>

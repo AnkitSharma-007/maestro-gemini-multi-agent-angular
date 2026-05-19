@@ -1,6 +1,6 @@
-export type AgentId = 'planner' | 'budget' | 'schedule' | 'venue';
+export type AgentId = 'planner' | 'auditor' | 'budget' | 'schedule' | 'venue';
 
-export type SpecialistId = Exclude<AgentId, 'planner'>;
+export type SpecialistId = Exclude<AgentId, 'planner' | 'auditor'>;
 
 export const SPECIALIST_IDS = ['budget', 'schedule', 'venue'] as const satisfies readonly SpecialistId[];
 
@@ -29,6 +29,21 @@ export interface AgentBrief {
 export interface PlannerOutput {
   rationale: string;
   agents: AgentBrief[];
+}
+
+export type AuditSeverity = 'warning' | 'info';
+
+export interface AuditIssue {
+  id: string;
+  targetId: SpecialistId;
+  severity: AuditSeverity;
+  message: string;
+  autoBrief: string;
+}
+
+export interface AuditorOutput {
+  summary: string;
+  issues: AuditIssue[];
 }
 
 export class MissingApiKeyError extends Error {

@@ -1,18 +1,26 @@
 <section class="cc">
   <form class="prompt-card" (ngSubmit)="submit()" (keydown)="onKeyDown($event)">
+    <div class="aurora" aria-hidden="true"></div>
+
     <div class="prompt-head">
       <div class="prompt-title">
-        <mat-icon aria-hidden="true">stars</mat-icon>
-        <span>Architect a dashboard</span>
+        <span class="title-glow" aria-hidden="true">
+          <mat-icon>auto_awesome</mat-icon>
+        </span>
+        <span class="title-text">
+          <span class="title-eyebrow">Architect a dashboard</span>
+          <span class="title-sub">Describe your event — five agents will compose it live.</span>
+        </span>
       </div>
-      <span class="hint">⌘ / Ctrl + Enter to dispatch</span>
+      <span class="hint" aria-hidden="true">
+        <kbd>⌘</kbd><span class="plus">+</span><kbd>↵</kbd>
+      </span>
     </div>
 
     <mat-form-field appearance="outline" class="prompt-field" subscriptSizing="dynamic">
-      <mat-label>Describe your event</mat-label>
       <textarea
         matInput
-        rows="3"
+        rows="4"
         [ngModel]="prompt()"
         (ngModelChange)="prompt.set($event)"
         name="prompt"
@@ -20,36 +28,77 @@
         placeholder="e.g. 3-day Agentic AI conference, Bengaluru, 1,200 attendees, ₹2.5cr budget…"
         autocomplete="off"
         spellcheck="true"
+        aria-label="Event brief"
       ></textarea>
     </mat-form-field>
 
+    @if (!isBusy() && samplePrompts.length) {
+      <div class="samples" aria-label="Sample prompts">
+        <span class="samples-label">
+          <mat-icon aria-hidden="true">bolt</mat-icon>
+          Try a starter
+        </span>
+        <div class="samples-row">
+          <button
+            type="button"
+            mat-stroked-button
+            class="sample-chip hero-chip"
+            (click)="applyHero()"
+            matTooltip="Demo prompt used in the walkthrough"
+            matTooltipPosition="above"
+          >
+            <mat-icon>auto_awesome</mat-icon>
+            Demo prompt
+          </button>
+          @for (sample of samplePrompts; track sample.label) {
+            <button
+              type="button"
+              mat-stroked-button
+              class="sample-chip"
+              (click)="applySample(sample)"
+              [matTooltip]="sample.prompt"
+              matTooltipPosition="above"
+            >
+              <mat-icon>{{ sample.icon }}</mat-icon>
+              {{ sample.label }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+
     <div class="prompt-actions">
-      <button
-        type="button"
-        mat-stroked-button
-        class="hero-chip"
-        (click)="applyHero()"
-        [disabled]="isBusy()"
-      >
-        <mat-icon>auto_awesome</mat-icon>
-        Try the demo prompt
-      </button>
-      <button
-        type="submit"
-        mat-flat-button
-        color="primary"
-        class="dispatch-btn"
-        [disabled]="!canSubmit()"
-      >
-        <mat-icon>rocket_launch</mat-icon>
-        Architect Dashboard
-      </button>
+      <span class="char-count" aria-live="polite">
+        {{ charCount() }} chars
+      </span>
+      <div class="action-buttons">
+        @if (prompt().length > 0 && !isBusy()) {
+          <button
+            type="button"
+            mat-button
+            class="clear-btn"
+            (click)="clearPrompt()"
+          >
+            Clear
+          </button>
+        }
+        <button
+          type="submit"
+          mat-flat-button
+          color="primary"
+          class="dispatch-btn"
+          [disabled]="!canSubmit()"
+        >
+          <mat-icon>rocket_launch</mat-icon>
+          <span>Architect Dashboard</span>
+        </button>
+      </div>
     </div>
   </form>
 
   @if (isBusy()) {
     <div class="banner" role="status" aria-live="polite">
-      <mat-progress-bar mode="indeterminate" />
+      <div class="banner-spinner" aria-hidden="true"></div>
       <span class="banner-text">
         @if (globalStatus() === 'planning') {
           Planner is decomposing your brief…
@@ -57,6 +106,7 @@
           Specialists are streaming results in parallel…
         }
       </span>
+      <mat-progress-bar mode="indeterminate" />
     </div>
   }
 </section>

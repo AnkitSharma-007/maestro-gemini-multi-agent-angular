@@ -18,8 +18,6 @@ describe('App', () => {
     fixture.detectChanges();
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain(
-      'Dynamic Event Architect',
-    );
+    expect(compiled.querySelector('h1')?.textContent).toContain('Maestro');
   });
 });

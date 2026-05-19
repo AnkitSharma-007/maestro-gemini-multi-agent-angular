@@ -37,6 +37,24 @@
     <mat-progress-bar mode="indeterminate" class="streaming-bar" />
   }
 
+  @if (mode() === 'real' && isStale()) {
+    <div class="stale-banner" role="status">
+      <mat-icon aria-hidden="true">sync_problem</mat-icon>
+      <span class="stale-msg">May be out of date — upstream widget changed</span>
+      <button
+        mat-flat-button
+        color="primary"
+        type="button"
+        class="stale-update-btn"
+        (click)="updateFromRipple()"
+        [disabled]="isStreaming()"
+      >
+        <mat-icon>refresh</mat-icon>
+        Update
+      </button>
+    </div>
+  }
+
   <div class="body">
     @switch (mode()) {
       @case ('ghost') {

@@ -1,12 +1,30 @@
 <section class="tower" aria-label="Mission control timeline">
   <header class="tower-head">
     <div class="title-line">
-      <span class="dot" [class.live]="globalStatus() === 'planning' || globalStatus() === 'running'"></span>
+      <span
+        class="dot"
+        [class.live]="globalStatus() === 'planning' || globalStatus() === 'running' || isReplaying()"
+      ></span>
       <h2>Mission Control</h2>
     </div>
-    <span class="state-pill state-{{ globalStatus() }}">
-      {{ globalStatus() | uppercase }}
-    </span>
+    <div class="head-actions">
+      @if (canReplay()) {
+        <button
+          mat-stroked-button
+          type="button"
+          class="replay-btn"
+          (click)="replay()"
+          matTooltip="Replay agent timeline (no API calls)"
+          matTooltipPosition="below"
+        >
+          <mat-icon>replay</mat-icon>
+          Replay
+        </button>
+      }
+      <span class="state-pill state-{{ globalStatus() }}">
+        {{ isReplaying() ? 'REPLAY' : (globalStatus() | uppercase) }}
+      </span>
+    </div>
   </header>
 
   @if (plannerRationale()) {
@@ -14,15 +32,20 @@
       <mat-icon aria-hidden="true">format_quote</mat-icon>
       {{ plannerRationale() }}
     </p>
-  } @else if (globalStatus() === 'idle') {
+  } @else if (globalStatus() === 'idle' && !isReplaying()) {
     <p class="rationale placeholder">
-      Submit a brief and watch four agents collaborate live — the planner here, then three specialists in parallel below.
+      Submit a brief and watch five agents collaborate — planner, auditor (critic), then three specialists in parallel.
     </p>
   }
 
   <ul class="rows">
     @for (row of rows(); track row.meta.id) {
-      <li class="row" [class.row-live]="row.isLive" [class.row-done]="row.state.status === 'done'" [class.row-error]="row.state.status === 'error'">
+      <li
+        class="row"
+        [class.row-live]="row.isLive"
+        [class.row-done]="row.state.status === 'done'"
+        [class.row-error]="row.state.status === 'error'"
+      >
         <div class="rail">
           @if (row.isLive) {
             <mat-spinner diameter="18" />
@@ -39,9 +62,20 @@
         <div class="info">
           <div class="info-top">
             <span class="role">{{ row.meta.label }}</span>
-            @if (row.duration !== undefined) {
-              <span class="duration">{{ formatDuration(row.duration) }}</span>
-            }
+            <span class="metrics">
+              @if (row.duration !== undefined) {
+                <span class="duration">{{ formatDuration(row.duration) }}</span>
+              }
+              @if (row.telemetry) {
+                <span
+                  class="tokens"
+                  [matTooltip]="telemetryHint(row)"
+                  matTooltipPosition="above"
+                >
+                  {{ formatTokens(row.telemetry.totalTokens) }} tok
+                </span>
+              }
+            </span>
           </div>
           <div class="info-bottom">
             <span class="status status-{{ row.state.status }}">
@@ -52,9 +86,36 @@
                 {{ row.state.error }}
               </span>
             }
+            @if (row.canRetry) {
+              <button
+                mat-stroked-button
+                type="button"
+                class="retry-btn"
+                (click)="retry(row.meta.id)"
+              >
+                <mat-icon>refresh</mat-icon>
+                Retry
+              </button>
+            }
           </div>
         </div>
       </li>
     }
   </ul>
+
+  @if (hasTelemetry()) {
+    <footer class="telemetry-bar" aria-label="Run telemetry summary">
+      <mat-icon aria-hidden="true">insights</mat-icon>
+      <span class="telemetry-copy">
+        <strong>{{ formatTokens(runTotals().totalTokens) }}</strong> tokens
+        <span class="sep">·</span>
+        <strong>{{ formatCost(runTotals().estimatedCostUsd) }}</strong> est.
+        @if (runWallMs() !== undefined) {
+          <span class="sep">·</span>
+          <span>{{ formatDuration(runWallMs()) }} wall</span>
+        }
+      </span>
+      <span class="telemetry-note">Paid-tier list prices; grounding billed separately.</span>
+    </footer>
+  }
 </section>

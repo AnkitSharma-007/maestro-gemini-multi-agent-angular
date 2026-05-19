@@ -12,12 +12,40 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { AgentOrchestrator } from '../../core/ai/agent-orchestrator.service';
 import { ApiKeyService } from '../../core/auth/api-key.service';
 import { AgentStore } from '../../core/state/agent.store';
 import { classifyApiError, MissingApiKeyError } from '../../core/types/agent.types';
 
 const HERO_PROMPT = `Plan a 3-day, 1,200-attendee Agentic AI conference in Bengaluru in March 2026, INR ₹2.5 crore budget, with hands-on workshops on multi-agent orchestration and a closing fireside.`;
+
+interface SamplePrompt {
+  icon: string;
+  label: string;
+  prompt: string;
+}
+
+const SAMPLE_PROMPTS: SamplePrompt[] = [
+  {
+    icon: 'rocket_launch',
+    label: 'Product launch',
+    prompt:
+      'Plan a 1-day product launch in San Francisco for 400 press and partners next April, USD $180k budget, with a 90-minute keynote, a hands-on demo lounge, and an evening rooftop reception.',
+  },
+  {
+    icon: 'school',
+    label: 'Developer summit',
+    prompt:
+      'Plan a 2-day developer summit for 600 engineers in Berlin this October, EUR €420k budget, with two parallel tracks on AI infrastructure and platform engineering, plus a Friday night networking dinner.',
+  },
+  {
+    icon: 'celebration',
+    label: 'Founders retreat',
+    prompt:
+      'Plan a 4-day intimate founders retreat in Bali for 50 invitees in November, USD $260k budget, mixing strategy workshops, surf sessions, and a closing dinner at a private villa.',
+  },
+];
 
 @Component({
   selector: 'dea-command-center',
@@ -29,6 +57,7 @@ const HERO_PROMPT = `Plan a 3-day, 1,200-attendee Agentic AI conference in Benga
     MatIconModule,
     MatInputModule,
     MatProgressBarModule,
+    MatTooltipModule,
   ],
   templateUrl: './command-center.html',
   styleUrl: './command-center.scss',
@@ -41,6 +70,7 @@ export class CommandCenter {
 
   protected readonly prompt = signal<string>('');
   protected readonly heroPrompt = HERO_PROMPT;
+  protected readonly samplePrompts = SAMPLE_PROMPTS;
 
   protected readonly hasKey = this.apiKeys.hasKey;
   protected readonly globalStatus = this.store.globalStatus;
@@ -54,6 +84,18 @@ export class CommandCenter {
     if (this.isBusy()) return;
     this.prompt.set(this.heroPrompt);
   }
+
+  protected applySample(sample: SamplePrompt): void {
+    if (this.isBusy()) return;
+    this.prompt.set(sample.prompt);
+  }
+
+  protected clearPrompt(): void {
+    if (this.isBusy()) return;
+    this.prompt.set('');
+  }
+
+  protected readonly charCount = computed(() => this.prompt().length);
 
   protected async submit(): Promise<void> {
     if (!this.canSubmit()) return;

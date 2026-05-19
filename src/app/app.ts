@@ -15,6 +15,7 @@ import { ThemeService } from './core/theme/theme.service';
 import { CommandCenter } from './features/command-center/command-center';
 import { NoKeyEmptyState } from './features/command-center/no-key-empty-state';
 import { ControlTower } from './features/control-tower/control-tower';
+import { AuditRibbon } from './features/audit-ribbon/audit-ribbon';
 import { GenerativeRenderer } from './features/renderer/generative-renderer';
 
 @Component({
@@ -26,6 +27,7 @@ import { GenerativeRenderer } from './features/renderer/generative-renderer';
     MatTooltipModule,
     CommandCenter,
     ControlTower,
+    AuditRibbon,
     GenerativeRenderer,
     NoKeyEmptyState,
   ],

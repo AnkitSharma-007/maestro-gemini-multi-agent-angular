@@ -1,0 +1,129 @@
+<section class="ribbon" aria-label="Dashboard critic audit">
+  @if (isAuditorRunning()) {
+    <div class="state state-running" role="status" aria-live="polite">
+      <div class="head">
+        <mat-icon aria-hidden="true">rule</mat-icon>
+        <span class="headline">Critic reviewing the dashboard…</span>
+      </div>
+      <mat-progress-bar mode="indeterminate" />
+    </div>
+  } @else if (isAuditorErrored()) {
+    <div class="state state-unavailable" role="status">
+      <mat-icon aria-hidden="true">rule</mat-icon>
+      <span>Auditor unavailable</span>
+      <button
+        mat-stroked-button
+        type="button"
+        class="reaudit-btn"
+        (click)="reAudit()"
+      >
+        <mat-icon>refresh</mat-icon>
+        Retry
+      </button>
+    </div>
+  } @else if (isClean()) {
+    <div class="state state-clean" role="status">
+      <mat-icon aria-hidden="true">verified</mat-icon>
+      <span>{{ auditSummary() ?? 'Looks consistent — no cross-widget issues found.' }}</span>
+      <button
+        mat-stroked-button
+        type="button"
+        class="reaudit-btn"
+        (click)="reAudit()"
+      >
+        <mat-icon>refresh</mat-icon>
+        Re-audit
+      </button>
+    </div>
+  } @else if (hasIssues()) {
+    <div class="state state-issues">
+      <header class="head">
+        <div class="head-left">
+          <mat-icon aria-hidden="true">rule</mat-icon>
+          <span class="headline">
+            Critic · {{ auditIssues().length }}
+            {{ auditIssues().length === 1 ? 'issue' : 'issues' }}
+          </span>
+          @if (auditSummary()) {
+            <span class="sub">{{ auditSummary() }}</span>
+          }
+        </div>
+        <button
+          mat-stroked-button
+          type="button"
+          class="reaudit-btn"
+          (click)="reAudit()"
+          [disabled]="isAuditorRunning()"
+        >
+          <mat-icon>refresh</mat-icon>
+          Re-audit
+        </button>
+      </header>
+
+      <ul class="issues">
+        @for (issue of auditIssues(); track issue.id) {
+          <li class="issue" [class.severity-warning]="issue.severity === 'warning'">
+            <span
+              class="severity-dot"
+              [attr.aria-label]="issue.severity"
+            ></span>
+            <mat-icon class="target-icon" aria-hidden="true">
+              {{ iconFor(issue.targetId) }}
+            </mat-icon>
+            <span class="message" [matTooltip]="issue.message" matTooltipPosition="above">
+              {{ issue.message }}
+            </span>
+            <div class="actions">
+              <button
+                mat-flat-button
+                color="primary"
+                type="button"
+                class="apply-btn"
+                (click)="applyFix(issue)"
+                [disabled]="!canApply(issue)"
+              >
+                Apply fix
+              </button>
+              <button
+                mat-icon-button
+                type="button"
+                class="dismiss-btn"
+                (click)="dismiss(issue)"
+                matTooltip="Dismiss"
+                matTooltipPosition="above"
+                aria-label="Dismiss issue"
+              >
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+          </li>
+        }
+      </ul>
+    </div>
+  } @else if (specialistsRunning()) {
+    <div class="state state-waiting" role="status">
+      <mat-icon aria-hidden="true">rule</mat-icon>
+      <span>Critic standing by — will review once specialists finish.</span>
+    </div>
+  } @else if (awaitingAudit()) {
+    <div class="state state-waiting" role="status">
+      <mat-icon aria-hidden="true">rule</mat-icon>
+      <span>Specialists done — run the critic to check for cross-widget issues.</span>
+      <button
+        mat-flat-button
+        color="primary"
+        type="button"
+        class="reaudit-btn"
+        (click)="reAudit()"
+      >
+        <mat-icon>rule</mat-icon>
+        Run critic
+      </button>
+    </div>
+  } @else {
+    <div class="state state-waiting" role="status">
+      <mat-icon aria-hidden="true">rule</mat-icon>
+      <span>Critic agent — cross-checks budget, schedule, and venue after each run.</span>
+    </div>
+  }
+</section>

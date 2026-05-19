@@ -217,3 +217,57 @@ export const VENUE_SCHEMA: Schema = {
     },
   },
 };
+
+export const AUDITOR_SCHEMA: Schema = {
+  type: Type.OBJECT,
+  required: ['summary', 'issues'],
+  description:
+    'Cross-widget consistency audit of an event-planning dashboard.',
+  properties: {
+    summary: {
+      type: Type.STRING,
+      description:
+        'One-line headline (under 120 chars), e.g. "2 issues across budget and venue" ' +
+        'or "Looks consistent — no cross-widget issues found."',
+    },
+    issues: {
+      type: Type.ARRAY,
+      description:
+        '0-5 actionable cross-widget inconsistencies. Empty array if the dashboard is consistent.',
+      items: {
+        type: Type.OBJECT,
+        required: ['id', 'targetId', 'severity', 'message', 'autoBrief'],
+        properties: {
+          id: {
+            type: Type.STRING,
+            description:
+              'Stable kebab-case id, e.g. "venue-capacity-mismatch".',
+          },
+          targetId: {
+            type: Type.STRING,
+            format: 'enum',
+            enum: ['budget', 'schedule', 'venue'],
+            description: 'Which specialist widget should be refined to fix this issue.',
+          },
+          severity: {
+            type: Type.STRING,
+            format: 'enum',
+            enum: ['warning', 'info'],
+            description: 'warning = likely incorrect; info = suggestion.',
+          },
+          message: {
+            type: Type.STRING,
+            description:
+              'Human-readable issue (under 120 chars) shown on the fix-it chip.',
+          },
+          autoBrief: {
+            type: Type.STRING,
+            description:
+              'Self-contained refine prompt sent to the target specialist agent. ' +
+              'Include numbers and context from the user brief.',
+          },
+        },
+      },
+    },
+  },
+};

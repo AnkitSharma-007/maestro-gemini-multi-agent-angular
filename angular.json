@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "dynamic-event-architect": {
+    "maestro": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -59,10 +59,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "dynamic-event-architect:build:production"
+              "buildTarget": "maestro:build:production"
             },
             "development": {
-              "buildTarget": "dynamic-event-architect:build:development"
+              "buildTarget": "maestro:build:development"
             }
           },
           "defaultConfiguration": "development"

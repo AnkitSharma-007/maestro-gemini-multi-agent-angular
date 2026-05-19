@@ -3,9 +3,11 @@ import {
   GoogleGenAI,
   ThinkingLevel,
   type GenerateContentResponse,
+  type GenerateContentResponseUsageMetadata,
   type GroundingChunk,
   type Schema,
 } from '@google/genai';
+import { usageFromMetadata } from '../gemini-pricing';
 import { ApiKeyService } from '../../auth/api-key.service';
 import { AgentStore } from '../../state/agent.store';
 import {
@@ -53,10 +55,12 @@ export abstract class AgentBase {
 
     let buffer = '';
     const groundingChunks: GroundingChunk[] = [];
+    let lastUsage: GenerateContentResponseUsageMetadata | undefined;
+    const model = this.apiKeys.model();
 
     try {
       const stream = await this.lazyClient().models.generateContentStream({
-        model: this.apiKeys.model(),
+        model,
         contents: opts.contents,
         config: {
           systemInstruction: opts.systemInstruction,
@@ -76,9 +80,14 @@ export abstract class AgentBase {
         const text = chunk.text;
         if (text) buffer += text;
 
+        if (chunk.usageMetadata) lastUsage = chunk.usageMetadata;
+
         const md = chunk.candidates?.[0]?.groundingMetadata;
         if (md?.groundingChunks?.length) groundingChunks.push(...md.groundingChunks);
       }
+
+      const usage = usageFromMetadata(lastUsage);
+      if (usage) this.store.recordAgentUsage(this.id, usage, model);
 
       const value = parseJsonResponse<T>(buffer, !!opts.ground);
       const citations = mapCitations(groundingChunks);
@@ -86,6 +95,8 @@ export abstract class AgentBase {
       this.store.setAgentStatus(this.id, 'done');
       return { value, citations: citations.length ? citations : undefined };
     } catch (err) {
+      const usage = usageFromMetadata(lastUsage);
+      if (usage) this.store.recordAgentUsage(this.id, usage, model);
       const message = err instanceof Error ? err.message : String(err);
       this.store.setAgentStatus(this.id, 'error', message);
       (err as { __dea_class?: string }).__dea_class = classifyApiError(err);

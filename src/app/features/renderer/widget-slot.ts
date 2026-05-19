@@ -77,6 +77,14 @@ export class WidgetSlot implements OnDestroy {
       }
       this.materialiseOrUpdate(id, w);
     });
+
+    effect(() => {
+      const id = this.slotId();
+      this.store.staleWidgets();
+      if (this.widget() && this.componentRef) {
+        this.componentRef.changeDetectorRef.markForCheck();
+      }
+    });
   }
 
   ngOnDestroy(): void {

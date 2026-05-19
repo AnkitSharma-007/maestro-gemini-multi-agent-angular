@@ -1,7 +1,9 @@
-# Dynamic Event Architect
+# Maestro
+
+> Multi-agent event orchestration · Gemini
 
 A generative-UI hackathon project that turns one event-planning sentence into a
-live dashboard built by **four cooperating Gemini agents**. There is **no
+live dashboard conducted by **five cooperating Gemini agents**. There is **no
 backend** — the app runs entirely in your browser, you bring your own
 Gemini API key, and the multi-agent pipeline streams structured JSON straight
 into Angular components in real time.
@@ -23,16 +25,30 @@ into Angular components in real time.
    `setInput()`.
 2. **Multi-agent orchestration** — a Planner agent decomposes the brief, then
    three specialist agents (Budget, Schedule, Venue) run in **parallel** via
-   `Promise.allSettled`, each streaming its own structured-output JSON.
-3. **Conversational refinement** — every rendered widget has its own Refine
+   `Promise.allSettled`, each streaming its own structured-output JSON. A fifth
+   **Auditor** agent then cross-checks the widgets for inconsistencies.
+3. **Critic fix-it chips** — the Auditor surfaces cross-widget issues (e.g.
+   venue capacity vs attendee count) as one-click fix-it chips above the
+   dashboard; applying a fix re-runs only the target specialist and
+   auto-re-audits.
+4. **Cross-widget ripple refines** — venue and schedule changes mark the
+   budget widget stale; manual refines show a one-click **Update** banner,
+   while Auditor fix-its auto-cascade downstream before re-auditing.
+5. **Mission Control polish** — live elapsed timers while agents run,
+   per-agent **Retry** on failures, and **Replay** to re-watch the last
+   timeline without additional API calls.
+6. **Token & cost telemetry** — each agent row shows tokens and estimated
+   USD from Gemini `usageMetadata`; a run footer totals tokens, cost, and
+   wall-clock time (paid-tier list prices; grounding billed separately).
+7. **Conversational refinement** — every rendered widget has its own Refine
    bar; refinement re-dispatches **only the owning agent** with the prior
    payload as context, so the other widgets never blink.
-4. **Google Search grounding** — the Schedule and Venue agents are grounded
+8. **Google Search grounding** — the Schedule and Venue agents are grounded
    on Google Search and surface real source citations on the rendered cards.
-5. **BYOK** — the user pastes their own Gemini API key once. It is validated
+9. **BYOK** — the user pastes their own Gemini API key once. It is validated
    against `models.list`, stored in `localStorage`, and never leaves their
    browser.
-6. **Zoneless Angular 21 + Signals** — `provideZonelessChangeDetection`,
+10. **Zoneless Angular 21 + Signals** — `provideZonelessChangeDetection`,
    signal inputs everywhere, `OnPush` throughout, and a slot-based renderer
    that reacts to a joint `(agentStates, widgets)` view of the store.
 
@@ -54,20 +70,23 @@ into Angular components in real time.
         │  (JSON)     │ │ + Search🔍 │ │ + Search🔍  │
         └─────────────┘ └────────────┘ └─────────────┘
                   │       │       │
-                  ▼       ▼       ▼
+                  └───────┴───────┘
+                          ▼
+                  ┌───────────────┐
+                  │ AuditorAgent  │── cross-widget consistency JSON
+                  └───────┬───────┘
+                          ▼
                   AgentStore  (signals)
-                  │       │       │
-                  ▼       ▼       ▼
-       ┌─────────────────────────────────┐
-       │     GenerativeRenderer          │
-       │  (slot-per-specialist, ghost /  │
-       │   real / error driven by joint  │
-       │   agentStates + widgets state)  │
-       └──┬──────────────┬──────────────┬┘
-          ▼              ▼              ▼
-        Budget         Schedule        Venue
-        Widget         Widget          Widget
-        + Refine       + Refine        + Citations
+                          │
+          ┌───────────────┴───────────────────────┐
+          ▼                                       ▼
+   AuditRibbon (fix-it chips)          GenerativeRenderer
+          │                             (ghost / real / error slots)
+          │ fix-it → refine                      │
+          └──────────────────────────────────────┤
+                                                 ▼
+                                    Budget / Schedule / Venue widgets
+                                    (+ Refine bars, grounded citations)
 ```
 
 Layered project layout under `src/app/`:
@@ -77,11 +96,12 @@ Layered project layout under `src/app/`:
 | `core/auth/` | `ApiKeyService` (BYOK + localStorage + `validate()`) and `ApiKeyDialog`. |
 | `core/types/` | `agent.types.ts`, `widget.types.ts` — the typed surface area. |
 | `core/state/` | `agent.store.ts` — id-keyed widgets, per-agent state, planner rationale, global status. |
-| `core/ai/` | `gemini.schemas.ts`, `gemini.prompts.ts`, `agents/*.agent.ts`, `agent-orchestrator.service.ts`. |
+| `core/ai/` | `gemini.schemas.ts`, `gemini.prompts.ts`, `gemini-pricing.ts`, `ripple.ts`, `agents/*.agent.ts`, `agent-orchestrator.service.ts`. |
 | `features/widgets/` | `widget-shell` (ghost/real/error chrome + refine pulse), `refine-bar`, `citation-chips`, `budget-widget`, `schedule-widget`, `venue-widget`. |
 | `features/renderer/` | `widget-slot` (the `ViewContainerRef`-owning element) + `widget-registry` + `generative-renderer`. |
 | `features/control-tower/` | `control-tower` — the live mission-control timeline that lights up as agents run. |
 | `features/command-center/` | `command-center` (prompt + dashboard) and `no-key-empty-state`. |
+| `features/audit-ribbon/` | `audit-ribbon` — critic summary, fix-it chips, re-audit control. |
 | `app.ts` / `app.html` / `app.scss` | The shell: top bar, key chip, two-column layout. |
 
 ---
@@ -97,8 +117,8 @@ npm start          # http://localhost:4200
 ```
 
 The first time you load the page you'll see the BYOK empty state. Paste your
-key, hit **Save & Validate**, and submit the demo prompt — three agents stream
-into the dashboard in parallel.
+key, hit **Save & Validate**, and submit the demo prompt — three specialists
+stream into the dashboard in parallel, then the Auditor reviews them.
 
 ### Other commands
 
@@ -117,13 +137,21 @@ npm test -- --watch=false   # one-shot test run
 | 0s | App loads, BYOK empty state visible. | "No backend — the user owns the key." |
 | 3s | Click **Connect Gemini key**, paste key, **Save & Validate**. | "Validated against `models.list` before we trust it." |
 | 8s | Click **Try the demo prompt** chip → click **Architect Dashboard**. | "One sentence in." |
-| 9s | Watch **Mission Control** light up: planner → three specialists in parallel. | "Four agents collaborating live." |
+| 9s | Watch **Mission Control** light up: planner → three specialists in parallel. | "Five agents collaborating live." |
 | 12s | Three ghost slots appear, then fill in as each agent finishes. | "Slot-based renderer — each widget materialises independently." |
-| 16s | Venue widget shows real **Source chips** (citations). | "Schedule and Venue agents are grounded on Google Search — these are *real* venues, not hallucinations." |
-| 20s | Click the **Refine** button on the Budget widget, type "shrink the venue line item by 30%", apply. | "Conversational refinement — only the Budget agent re-runs." |
-| 26s | Budget widget pulses purple as it updates in place; the other widgets and the planner don't blink. | "Per-widget regeneration. The dashboard is alive, not a snapshot." |
-| 35s | Switch to **Quality** mode in the key dialog and re-submit. | "Same UI, swap in `gemini-3-pro-preview` for higher fidelity." |
-| 50s | Recap: zoneless Angular 21, signals, dynamic component rendering, multi-agent + grounded structured outputs, BYOK, fully static deploy. | "All the parts no demo usually has all at once, in 1 MB of JS." |
+| 16s | **Auditor row** in Mission Control flips to thinking → done; **Audit ribbon** appears above the grid. | "A fifth agent reviews the other three for cross-widget inconsistencies." |
+| 18s | If issues appear, point at a fix-it chip (e.g. venue capacity vs attendees). | "The critic caught a real inconsistency — not just three isolated widgets." |
+| 22s | Click **Apply fix** on a venue chip → venue refines, budget auto-ripples, ribbon re-audits. | "Critic fix-it → venue updates → budget cascades automatically." |
+| 26s | Venue widget shows real **Source chips** (citations). | "Schedule and Venue agents are grounded on Google Search — these are *real* venues, not hallucinations." |
+| 28s | **Refine** the Venue widget (e.g. change city to Mumbai), apply. | "Manual refine — only the venue agent re-runs." |
+| 32s | Budget widget shows **May be out of date** banner with **Update**. | "The dashboard knows budget depends on venue." |
+| 34s | Click **Update** on the budget banner. | "One click — budget refreshes with the new venue as context." |
+| 38s | Budget pulses; critic re-audits if applicable. | "Cross-widget dependencies, not three isolated panels." |
+| 42s | Point at **live duration** counters ticking on Mission Control rows. | "Timers tick in real time while agents work." |
+| 44s | Click **Replay** in Mission Control. | "Re-watch the whole agent choreography — zero extra API spend." |
+| 46s | Hover token counts; point at the telemetry footer. | "Every agent reports tokens and estimated cost — full run transparency." |
+| 48s | Switch to **Quality** mode in the key dialog and re-submit. | "Same UI, swap in `gemini-3-pro-preview` for higher fidelity." |
+| 55s | Recap: zoneless Angular 21, signals, dynamic rendering, planner + specialists + auditor + fix-its, grounded outputs, BYOK. | "All the parts no demo usually has all at once, in 1 MB of JS." |
 
 ---
 
@@ -138,6 +166,9 @@ npm test -- --watch=false   # one-shot test run
   and carves the outer `{ … }` block before re-parsing.
 - **Planner failure fallback**: if the planner errors out, the orchestrator
   dispatches all three specialists with the raw user intent as their brief.
+- **Auditor failure isolation**: if the auditor errors out, the dashboard and
+  fix-it ribbon show "Auditor unavailable"; specialists' widgets remain usable.
+  Manual per-widget refines do not trigger re-audit; fix-it chips do.
 - **Auth/quota classification**: `classifyApiError` tags errors as
   `auth | quota | network | other` so the snackbar can be honest about why
   things broke.
@@ -168,6 +199,5 @@ hackathon submission tight and demoable:
 - Markdown / rich-text widgets
 - Save / share dashboards (no persistence)
 - Voice prompt entry
-- Per-agent retry button
-- Live ticking duration counter (we update on transitions only)
+- Server-side cost accounting (browser estimates from list prices only)
 - Deployment configuration (handled separately by the author)

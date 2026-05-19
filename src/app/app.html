@@ -1,52 +1,56 @@
 <header class="topbar">
-  <div class="brand">
-    <div class="logo">
-      <mat-icon aria-hidden="true">auto_awesome_motion</mat-icon>
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <mat-icon>graphic_eq</mat-icon>
+      </div>
+      <div class="brand-text">
+        <h1>
+          <span class="brand-gradient">Maestro</span>
+        </h1>
+        <p>Multi-agent event orchestration · Gemini</p>
+      </div>
     </div>
-    <div class="brand-text">
-      <h1>Dynamic Event Architect</h1>
-      <p>Generative UI · Multi-agent Gemini orchestration</p>
-    </div>
-  </div>
 
-  <div class="topbar-right">
-    <button
-      mat-icon-button
-      type="button"
-      class="theme-toggle"
-      (click)="toggleTheme()"
-      [matTooltip]="isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
-      matTooltipPosition="below"
-      [attr.aria-label]="isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
-    >
-      <mat-icon>{{ isDark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
-    </button>
-
-    @if (hasKey()) {
+    <div class="topbar-right">
       <button
-        mat-stroked-button
+        mat-icon-button
         type="button"
-        class="key-chip key-chip-on"
-        (click)="openKeyDialog()"
-        matTooltip="Change key or quality mode"
+        class="theme-toggle"
+        (click)="toggleTheme()"
+        [matTooltip]="isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
         matTooltipPosition="below"
+        [attr.aria-label]="isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
       >
-        <mat-icon class="ok">check_circle</mat-icon>
-        <span class="masked">{{ maskedKey() }}</span>
-        <span class="mode-pill">{{ modeLabel() }}</span>
+        <mat-icon>{{ isDark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
       </button>
-    } @else {
-      <button
-        mat-flat-button
-        color="primary"
-        type="button"
-        class="key-chip"
-        (click)="openKeyDialog()"
-      >
-        <mat-icon>key</mat-icon>
-        Connect Gemini key
-      </button>
-    }
+
+      @if (hasKey()) {
+        <button
+          mat-stroked-button
+          type="button"
+          class="key-chip key-chip-on"
+          (click)="openKeyDialog()"
+          matTooltip="Change key or quality mode"
+          matTooltipPosition="below"
+        >
+          <mat-icon class="ok">check_circle</mat-icon>
+          <span class="masked">{{ maskedKey() }}</span>
+          <span class="mode-pill">{{ modeLabel() }}</span>
+        </button>
+      } @else {
+        <button
+          mat-flat-button
+          color="primary"
+          type="button"
+          class="key-chip key-cta"
+          (click)="openKeyDialog()"
+        >
+          <mat-icon>key</mat-icon>
+          <span class="key-cta-label">Connect Gemini key</span>
+        </button>
+      }
+    </div>
   </div>
 </header>
 
@@ -54,7 +58,7 @@
   @if (!hasKey()) {
     <dea-no-key-empty-state />
   } @else {
-    <div class="layout-grid">
+    <div class="layout-grid" [class.is-active]="hasContent() || isBusy()">
       <div class="cc-col">
         <dea-command-center />
       </div>
@@ -63,22 +67,33 @@
       </aside>
     </div>
 
-    <section class="dashboard-row">
-      @if (hasContent() || isBusy()) {
+    @if (hasContent() || isBusy()) {
+      <section class="dashboard-row">
+        <dea-audit-ribbon />
         <dea-generative-renderer />
-      } @else {
+      </section>
+    } @else {
+      <section class="dashboard-row dashboard-row-empty">
         <div class="dashboard-empty">
-          <mat-icon aria-hidden="true">dashboard_customize</mat-icon>
+          <div class="empty-illu" aria-hidden="true">
+            <mat-icon>dashboard_customize</mat-icon>
+          </div>
+          <h3>Your dashboard appears here</h3>
           <p>
-            Ready when you are. Submit a brief above and three Gemini agents will compose your event
-            dashboard live.
+            Submit a brief above and watch five Gemini agents — Planner, Auditor, and three
+            specialists — compose a live, citation-grounded event dashboard in real time.
           </p>
         </div>
-      }
-    </section>
+      </section>
+    }
   }
 </main>
 
 <footer class="footer">
-  <span>Agentic UI with Angular. Runs entirely in your browser.</span>
+  <span class="footer-brand">
+    <mat-icon aria-hidden="true">bolt</mat-icon>
+    Agentic UI with Angular · Zoneless · Signals
+  </span>
+  <span class="footer-sep">·</span>
+  <span>Runs entirely in your browser. Your key never leaves the tab.</span>
 </footer>
