@@ -1,13 +1,7 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  effect,
-  inject,
-  untracked,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatIconModule } from '@angular/material/icon';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { ApiKeyService } from '../../core/auth/api-key.service';
 import { AgentStore } from '../../core/state/agent.store';
 import { PromptDraftService } from '../../core/state/prompt-draft.service';
@@ -36,7 +30,6 @@ export class HomePage {
   private readonly store = inject(AgentStore);
   private readonly drafts = inject(PromptDraftService);
   private readonly route = inject(ActivatedRoute);
-  private readonly router = inject(Router);
 
   protected readonly hasKey = this.apiKeys.hasKey;
   protected readonly hasContent = this.store.hasContent;
@@ -48,17 +41,8 @@ export class HomePage {
 
   constructor() {
     effect(() => {
-      const params = this.queryParams();
-      const tryPrompt = params.get('try');
-      if (!tryPrompt) return;
-      untracked(() => {
-        this.drafts.set(tryPrompt);
-        void this.router.navigate([], {
-          relativeTo: this.route,
-          queryParams: {},
-          replaceUrl: true,
-        });
-      });
+      const tryPrompt = this.queryParams().get('try');
+      if (tryPrompt) this.drafts.set(tryPrompt);
     });
   }
 }

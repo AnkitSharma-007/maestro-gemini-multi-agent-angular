@@ -3,28 +3,13 @@
     <div class="title-line">
       <span
         class="dot"
-        [class.live]="globalStatus() === 'planning' || globalStatus() === 'running' || isReplaying()"
+        [class.live]="globalStatus() === 'planning' || globalStatus() === 'running'"
       ></span>
       <h2>Mission Control</h2>
     </div>
-    <div class="head-actions">
-      @if (canReplay()) {
-        <button
-          mat-stroked-button
-          type="button"
-          class="replay-btn"
-          (click)="replay()"
-          matTooltip="Replay agent timeline (no API calls)"
-          matTooltipPosition="below"
-        >
-          <mat-icon>replay</mat-icon>
-          Replay
-        </button>
-      }
-      <span class="state-pill state-{{ globalStatus() }}">
-        {{ isReplaying() ? 'REPLAY' : (globalStatus() | uppercase) }}
-      </span>
-    </div>
+    <span class="state-pill state-{{ globalStatus() }}">
+      {{ globalStatus() | uppercase }}
+    </span>
   </header>
 
   @if (plannerRationale()) {
@@ -32,9 +17,9 @@
       <mat-icon aria-hidden="true">format_quote</mat-icon>
       {{ plannerRationale() }}
     </p>
-  } @else if (globalStatus() === 'idle' && !isReplaying()) {
+  } @else if (globalStatus() === 'idle') {
     <p class="rationale placeholder">
-      Submit a brief and watch five agents collaborate — planner, auditor (critic), then three specialists in parallel.
+      Submit a brief and watch five agents collaborate: planner, auditor (critic), then three specialists in parallel.
     </p>
   }
 

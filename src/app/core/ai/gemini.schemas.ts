@@ -215,7 +215,7 @@ export const VENUE_SCHEMA: Schema = {
       type: Type.NUMBER,
       description:
         'Estimated total venue cost for the full duration of the event, in ' +
-        'the chosen currency (match the budget agent — INR for Indian cities, ' +
+        'the chosen currency (match the budget agent: INR for Indian cities, ' +
         'USD otherwise unless the brief specifies).',
     },
     currency: {
@@ -243,7 +243,7 @@ export const AUDITOR_SCHEMA: Schema = {
       type: Type.STRING,
       description:
         'One-line headline (under 120 chars), e.g. "2 issues across budget and venue" ' +
-        'or "Looks consistent — no cross-widget issues found."',
+        'or "Looks consistent. No cross-widget issues found."',
     },
     issues: {
       type: Type.ARRAY,

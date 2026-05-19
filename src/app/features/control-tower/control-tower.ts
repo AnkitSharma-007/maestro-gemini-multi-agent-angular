@@ -77,8 +77,6 @@ export class ControlTower {
 
   protected readonly globalStatus = this.store.globalStatus;
   protected readonly plannerRationale = this.store.plannerRationale;
-  protected readonly canReplay = this.store.canReplay;
-  protected readonly isReplaying = this.store.isReplaying;
   protected readonly runTotals = this.store.runTelemetryTotals;
   protected readonly hasTelemetry = this.store.hasTelemetry;
   protected readonly runWallMs = this.store.runWallDurationMs;
@@ -86,7 +84,6 @@ export class ControlTower {
   protected readonly rows = computed<RenderRow[]>(() => {
     this.liveTick();
     const states = this.store.agentStates();
-    const replaying = this.store.isReplaying();
     const ids: AgentId[] = ['planner', 'auditor', ...SPECIALIST_IDS];
     return ids.map((id) => {
       const state = states[id];
@@ -97,7 +94,6 @@ export class ControlTower {
       const duration = computeDuration(state, isLive);
       const canRetry =
         state.status === 'error' &&
-        !replaying &&
         !this.store.isBusy() &&
         (id === 'auditor' ||
           id === 'planner' ||
@@ -154,15 +150,6 @@ export class ControlTower {
     if (!row.telemetry) return '';
     const t = row.telemetry;
     return `${this.formatTokens(t.totalTokens)} tokens · ${this.formatCost(t.estimatedCostUsd)} est.`;
-  }
-
-  protected async replay(): Promise<void> {
-    if (!this.canReplay()) return;
-    try {
-      await this.orchestrator.replayTimeline();
-    } catch {
-      /* replay is local-only */
-    }
   }
 
   protected async retry(id: AgentId): Promise<void> {

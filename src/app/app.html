@@ -15,16 +15,15 @@
     <div class="topbar-right">
       <a
         mat-stroked-button
-        type="button"
-        class="tour-link"
-        [routerLink]="['/guide']"
-        routerLinkActive="is-active"
+        class="nav-link"
+        [routerLink]="['/architect']"
+        routerLinkActive="route-current"
         [routerLinkActiveOptions]="{ exact: true }"
-        matTooltip="Walk through every feature"
+        matTooltip="Open the architect workspace"
         matTooltipPosition="below"
       >
-        <mat-icon>auto_awesome</mat-icon>
-        <span class="tour-label">Tour</span>
+        <mat-icon>rocket_launch</mat-icon>
+        <span class="nav-link-label">Open Architect</span>
       </a>
 
       <button

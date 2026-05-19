@@ -9,7 +9,6 @@ import {
   SPECIALIST_IDS,
 } from '../types/agent.types';
 import { estimateCostUsd } from '../ai/gemini-pricing';
-import type { ReplayEvent } from '../types/replay.types';
 import {
   AgentTelemetryMap,
   emptyAgentTelemetry,
@@ -51,15 +50,10 @@ export class AgentStore {
   readonly auditSummary = signal<string | null>(null);
   readonly lastUserIntent = signal<string | null>(null);
   readonly staleWidgets = signal<readonly SpecialistId[]>([]);
-  readonly runTimeline = signal<readonly ReplayEvent[]>([]);
-  readonly isReplaying = signal(false);
   readonly agentBriefs = signal<Partial<Record<AgentId, string>>>({});
   readonly agentTelemetry = signal<AgentTelemetryMap>({});
   readonly runWallStartedAt = signal<number | null>(null);
   readonly runWallEndedAt = signal<number | null>(null);
-
-  private runStartedAt: number | null = null;
-  private recordingTimeline = false;
 
   readonly runTelemetryTotals = computed<RunTelemetryTotals>(() => {
     const map = this.agentTelemetry();
@@ -87,10 +81,6 @@ export class AgentStore {
   });
 
   readonly hasTelemetry = computed(() => this.runTelemetryTotals().totalTokens > 0);
-
-  readonly canReplay = computed(
-    () => this.runTimeline().length > 0 && !this.isReplaying() && !this.isBusy(),
-  );
 
   readonly globalStatus = computed<GlobalStatus>(() => {
     const states = this.agentStates();
@@ -158,33 +148,11 @@ export class AgentStore {
 
   /** `startedAt` is captured on the first active phase; `completedAt` on terminal. */
   setAgentStatus(id: AgentId, status: AgentStatus, error?: string): void {
-    if (
-      this.recordingTimeline &&
-      this.runStartedAt !== null &&
-      !this.isReplaying()
-    ) {
-      this.appendTimelineEvent({
-        atMs: Date.now() - this.runStartedAt,
-        id,
-        status,
-        error,
-      });
-    }
     this.patchAgentState(id, status, error);
   }
 
   setPlannerRationale(text: string): void {
     this.plannerRationale.set(text);
-    if (
-      this.recordingTimeline &&
-      this.runStartedAt !== null &&
-      !this.isReplaying()
-    ) {
-      this.appendTimelineEvent({
-        atMs: Date.now() - this.runStartedAt,
-        rationale: text,
-      });
-    }
   }
 
   setAgentBrief(id: AgentId, brief: string): void {
@@ -193,17 +161,6 @@ export class AgentStore {
 
   getAgentBrief(id: AgentId): string | undefined {
     return this.agentBriefs()[id];
-  }
-
-  beginRunRecording(): void {
-    const now = Date.now();
-    this.runStartedAt = now;
-    this.runWallStartedAt.set(now);
-    this.runWallEndedAt.set(null);
-    this.recordingTimeline = true;
-    this.runTimeline.set([]);
-    this.agentBriefs.set({});
-    this.agentTelemetry.set({});
   }
 
   touchRunWallEnded(): void {
@@ -231,19 +188,6 @@ export class AgentStore {
     return this.agentTelemetry()[id];
   }
 
-  resetAgentStatesOnly(): void {
-    this.agentStates.set(initialAgentStates());
-  }
-
-  applyReplayEvent(event: ReplayEvent): void {
-    if (event.rationale !== undefined) {
-      this.plannerRationale.set(event.rationale);
-    }
-    if (event.id !== undefined && event.status !== undefined) {
-      this.patchAgentState(event.id, event.status, event.error);
-    }
-  }
-
   private patchAgentState(id: AgentId, status: AgentStatus, error?: string): void {
     this.agentStates.update((state) => {
       const current = state[id] ?? { id, status: 'idle' as AgentStatus };
@@ -269,10 +213,6 @@ export class AgentStore {
         [id]: { id, status, error, startedAt, completedAt },
       };
     });
-  }
-
-  private appendTimelineEvent(event: ReplayEvent): void {
-    this.runTimeline.update((events) => [...events, event]);
   }
 
   setLastUserIntent(intent: string): void {
@@ -320,10 +260,10 @@ export class AgentStore {
     this.auditIssues.set([]);
     this.auditSummary.set(null);
     this.lastUserIntent.set(null);
-    this.runWallStartedAt.set(null);
+    this.runWallStartedAt.set(Date.now());
     this.runWallEndedAt.set(null);
+    this.agentBriefs.set({});
     this.agentTelemetry.set({});
     this.clearStale();
-    this.beginRunRecording();
   }
 }

@@ -83,7 +83,7 @@ export class AgentOrchestrator {
       if (signal.aborted) return;
       plan = this.fallbackPlan(trimmed);
       this.store.setPlannerRationale(
-        'Planner unavailable — running all specialists on the raw brief.',
+        'Planner unavailable. Running all specialists on the raw brief.',
       );
       this.store.setAgentStatus('planner', 'done');
     }
@@ -214,7 +214,7 @@ export class AgentOrchestrator {
         if (signal.aborted) return;
         const fallback = this.fallbackPlan(intent);
         this.store.setPlannerRationale(
-          'Planner unavailable — using the raw brief for all specialists.',
+          'Planner unavailable. Using the raw brief for all specialists.',
         );
         for (const a of fallback.agents) {
           if (a.needed) this.store.setAgentBrief(a.id, a.brief);
@@ -232,28 +232,6 @@ export class AgentOrchestrator {
     const prior = existing?.payload.config;
     await this.dispatch(id as SpecialistId, brief, prior, signal);
     this.store.touchRunWallEnded();
-  }
-
-  /** Replay the last run timeline in Mission Control (no API calls). */
-  async replayTimeline(): Promise<void> {
-    const events = this.store.runTimeline();
-    if (!events.length || this.store.isReplaying()) return;
-
-    this.store.isReplaying.set(true);
-    this.store.resetAgentStatesOnly();
-    this.store.plannerRationale.set(null);
-
-    let lastAt = 0;
-    for (const event of events) {
-      const delay = Math.max(0, event.atMs - lastAt);
-      if (delay > 0) {
-        await sleep(delay);
-      }
-      this.store.applyReplayEvent(event);
-      lastAt = event.atMs;
-    }
-
-    this.store.isReplaying.set(false);
   }
 
   private async rippleDispatch(
@@ -331,8 +309,4 @@ export class AgentOrchestrator {
       agents,
     };
   }
-}
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }

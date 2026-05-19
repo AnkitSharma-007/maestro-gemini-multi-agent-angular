@@ -9,7 +9,7 @@ import {
 describe('intoComponentConfig', () => {
   it('wraps a BudgetResult into a render_budget envelope', () => {
     const result: BudgetResult = {
-      title: 'Hackathon Budget',
+      title: 'Conference Budget',
       totalBudget: 50000,
       currency: 'USD',
       lineItems: [
@@ -21,7 +21,7 @@ describe('intoComponentConfig', () => {
 
     expect(config).toEqual({
       type: 'render_budget',
-      title: 'Hackathon Budget',
+      title: 'Conference Budget',
       config: {
         totalBudget: 50000,
         currency: 'USD',

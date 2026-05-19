@@ -24,7 +24,7 @@
   } @else if (isClean()) {
     <div class="state state-clean" role="status">
       <mat-icon aria-hidden="true">verified</mat-icon>
-      <span>{{ auditSummary() ?? 'Looks consistent — no cross-widget issues found.' }}</span>
+      <span>{{ auditSummary() ?? 'Looks consistent. No cross-widget issues found.' }}</span>
       <button
         mat-stroked-button
         type="button"
@@ -103,12 +103,12 @@
   } @else if (specialistsRunning()) {
     <div class="state state-waiting" role="status">
       <mat-icon aria-hidden="true">rule</mat-icon>
-      <span>Critic standing by — will review once specialists finish.</span>
+      <span>Critic standing by. Will review once specialists finish.</span>
     </div>
   } @else if (awaitingAudit()) {
     <div class="state state-waiting" role="status">
       <mat-icon aria-hidden="true">rule</mat-icon>
-      <span>Specialists done — run the critic to check for cross-widget issues.</span>
+      <span>Specialists done. Run the critic to check for cross-widget issues.</span>
       <button
         mat-flat-button
         color="primary"
@@ -123,7 +123,7 @@
   } @else {
     <div class="state state-waiting" role="status">
       <mat-icon aria-hidden="true">rule</mat-icon>
-      <span>Critic agent — cross-checks budget, schedule, and venue after each run.</span>
+      <span>Critic agent: cross-checks budget, schedule, and venue after each run.</span>
     </div>
   }
 </section>

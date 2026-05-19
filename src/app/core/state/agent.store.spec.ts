@@ -37,7 +37,6 @@ describe('AgentStore', () => {
       expect(store.isBusy()).toBe(false);
       expect(store.hasContent()).toBe(false);
       expect(store.hasTelemetry()).toBe(false);
-      expect(store.canReplay()).toBe(false);
     });
   });
 
@@ -229,12 +228,13 @@ describe('AgentStore', () => {
       expect(store.runTelemetryTotals().totalTokens).toBe(0);
     });
 
-    it('begins timeline recording so setAgentStatus appends replay events', () => {
+    it('starts the wall clock so runWallDurationMs becomes measurable', async () => {
       store.resetForRun();
-      store.setAgentStatus('budget', 'thinking');
-      store.setAgentStatus('budget', 'done');
-      expect(store.runTimeline().length).toBeGreaterThanOrEqual(2);
-      expect(store.canReplay()).toBe(true);
+      await new Promise((r) => setTimeout(r, 5));
+      store.touchRunWallEnded();
+      const ms = store.runWallDurationMs();
+      expect(ms).toBeDefined();
+      expect(ms!).toBeGreaterThanOrEqual(0);
     });
   });
 

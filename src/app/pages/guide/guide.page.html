@@ -11,8 +11,8 @@
         compose a live event dashboard in seconds.
       </h1>
       <p class="hero-lede">
-        Maestro turns one natural-language brief into a fully structured event plan —
-        budget, schedule, and venue — rendered as live Angular widgets, audited for
+        Maestro turns one natural-language brief into a fully structured event plan
+        (budget, schedule, and venue) rendered as live Angular widgets, audited for
         consistency, and refinable widget-by-widget. Entirely in your browser, with your
         own Gemini key.
       </p>
@@ -22,7 +22,7 @@
             mat-flat-button
             color="primary"
             class="cta-primary"
-            [routerLink]="['/']"
+            [routerLink]="['/architect']"
             [queryParams]="{ try: heroPrompt }"
           >
             <mat-icon>rocket_launch</mat-icon>
@@ -40,9 +40,9 @@
             <span>Connect a Gemini key to start</span>
           </button>
         }
-        <a mat-stroked-button class="cta-secondary" [routerLink]="['/']">
+        <a mat-stroked-button class="cta-secondary" [routerLink]="['/architect']">
           <mat-icon>arrow_forward</mat-icon>
-          <span>Skip to the app</span>
+          <span>Open the workspace</span>
         </a>
       </div>
       <p class="hero-foot">
@@ -116,7 +116,7 @@
       </span>
       <h3 class="pillar-title">Generative UI, not chat</h3>
       <p class="pillar-body">
-        Outputs render as live Angular widgets — a budget card, a multi-day schedule, a
+        Outputs render as live Angular widgets: a budget card, a multi-day schedule, a
         venue panel. You edit the dashboard, not a transcript.
       </p>
     </div>
@@ -230,13 +230,13 @@
           mat-flat-button
           color="primary"
           class="cta-primary"
-          [routerLink]="['/']"
+          [routerLink]="['/architect']"
           [queryParams]="{ try: heroPrompt }"
         >
           <mat-icon>rocket_launch</mat-icon>
           <span>Run the demo brief</span>
         </a>
-        <a mat-stroked-button class="cta-secondary" [routerLink]="['/']">
+        <a mat-stroked-button class="cta-secondary" [routerLink]="['/architect']">
           <mat-icon>edit_note</mat-icon>
           <span>Write my own</span>
         </a>
@@ -251,9 +251,9 @@
           <mat-icon>key</mat-icon>
           <span>Connect Gemini key</span>
         </button>
-        <a mat-stroked-button class="cta-secondary" [routerLink]="['/']">
+        <a mat-stroked-button class="cta-secondary" [routerLink]="['/architect']">
           <mat-icon>arrow_forward</mat-icon>
-          <span>Take me to the app</span>
+          <span>Open the workspace</span>
         </a>
       }
     </div>
