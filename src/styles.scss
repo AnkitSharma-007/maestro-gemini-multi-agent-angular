@@ -1,0 +1,101 @@
+@use '@angular/material' as mat;
+
+html {
+  color-scheme: dark;
+
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$violet-palette,
+        tertiary: mat.$cyan-palette,
+        theme-type: dark,
+      ),
+      typography: Inter,
+      density: 0,
+    )
+  );
+
+  --dea-bg: #0b0d12;
+  --dea-bg-elev-1: #11141b;
+  --dea-bg-elev-2: #161a23;
+  --dea-border: rgba(255, 255, 255, 0.08);
+  --dea-border-strong: rgba(255, 255, 255, 0.14);
+  --dea-fg: #e7e9ee;
+  --dea-fg-muted: #9aa0ac;
+  --dea-accent: #b69aff;
+  --dea-accent-glow: rgba(182, 154, 255, 0.35);
+  --dea-success: #5dd6a4;
+  --dea-warn: #ffb86b;
+  --dea-error: #ff6b8a;
+  --dea-radius-md: 12px;
+  --dea-radius-lg: 16px;
+  --dea-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.3);
+  --dea-transition: 200ms cubic-bezier(0.2, 0, 0, 1);
+  --dea-bg-image:
+    radial-gradient(1200px 800px at 100% -10%, rgba(120, 90, 220, 0.18), transparent 60%),
+    radial-gradient(900px 600px at -10% 110%, rgba(70, 180, 220, 0.12), transparent 55%);
+}
+
+html.theme-light {
+  color-scheme: light;
+
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$violet-palette,
+        tertiary: mat.$cyan-palette,
+        theme-type: light,
+      ),
+      typography: Inter,
+      density: 0,
+    )
+  );
+
+  --dea-bg: #f6f7fb;
+  --dea-bg-elev-1: #ffffff;
+  --dea-bg-elev-2: #eef0f7;
+  --dea-border: rgba(15, 18, 30, 0.08);
+  --dea-border-strong: rgba(15, 18, 30, 0.16);
+  --dea-fg: #1a1d24;
+  --dea-fg-muted: #5a6172;
+  --dea-accent: #6b3df5;
+  --dea-accent-glow: rgba(107, 61, 245, 0.18);
+  --dea-success: #0e8a5b;
+  --dea-warn: #b86a07;
+  --dea-error: #c2335a;
+  --dea-shadow-1: 0 1px 2px rgba(15, 18, 30, 0.06), 0 6px 16px rgba(15, 18, 30, 0.06);
+  --dea-bg-image:
+    radial-gradient(1200px 800px at 100% -10%, rgba(107, 61, 245, 0.10), transparent 60%),
+    radial-gradient(900px 600px at -10% 110%, rgba(35, 140, 200, 0.08), transparent 55%);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: var(--dea-bg);
+  background-image: var(--dea-bg-image);
+  color: var(--dea-fg);
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    system-ui,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  transition: background-color 220ms ease, color 220ms ease;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: var(--dea-accent);
+}

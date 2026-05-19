@@ -1,0 +1,123 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.body-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+}
+
+.totals {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 14px 16px;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--dea-accent) 12%, transparent),
+    transparent 70%
+  );
+  border: 1px solid color-mix(in srgb, var(--dea-accent) 25%, var(--dea-border));
+  border-radius: var(--dea-radius-md);
+
+  .label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--dea-fg-muted);
+  }
+
+  .amount {
+    display: block;
+    margin-top: 4px;
+    font-size: 22px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .dim .amount {
+    font-size: 18px;
+    color: var(--dea-fg-muted);
+  }
+}
+
+.lines {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.line {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.line-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+
+  .cat {
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--dea-fg);
+    cursor: help;
+    border-bottom: 1px dotted transparent;
+    transition: border-color var(--dea-transition);
+  }
+
+  .cat:hover {
+    border-bottom-color: var(--dea-fg-muted);
+  }
+
+  .amt {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    color: var(--dea-fg);
+    font-size: 13px;
+  }
+}
+
+mat-progress-bar {
+  --mdc-linear-progress-track-height: 6px;
+  --mdc-linear-progress-active-indicator-height: 6px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.rationale {
+  margin: 2px 0 0;
+  color: var(--dea-fg-muted);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+@media (max-width: 480px) {
+  .totals {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 12px 14px;
+
+    .amount {
+      font-size: 18px;
+    }
+
+    .dim .amount {
+      font-size: 16px;
+    }
+  }
+
+  .line-row .cat {
+    font-size: 13px;
+  }
+}

@@ -1,0 +1,84 @@
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">
+      <mat-icon aria-hidden="true">auto_awesome_motion</mat-icon>
+    </div>
+    <div class="brand-text">
+      <h1>Dynamic Event Architect</h1>
+      <p>Generative UI · Multi-agent Gemini orchestration</p>
+    </div>
+  </div>
+
+  <div class="topbar-right">
+    <button
+      mat-icon-button
+      type="button"
+      class="theme-toggle"
+      (click)="toggleTheme()"
+      [matTooltip]="isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
+      matTooltipPosition="below"
+      [attr.aria-label]="isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
+    >
+      <mat-icon>{{ isDark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+    </button>
+
+    @if (hasKey()) {
+      <button
+        mat-stroked-button
+        type="button"
+        class="key-chip key-chip-on"
+        (click)="openKeyDialog()"
+        matTooltip="Change key or quality mode"
+        matTooltipPosition="below"
+      >
+        <mat-icon class="ok">check_circle</mat-icon>
+        <span class="masked">{{ maskedKey() }}</span>
+        <span class="mode-pill">{{ modeLabel() }}</span>
+      </button>
+    } @else {
+      <button
+        mat-flat-button
+        color="primary"
+        type="button"
+        class="key-chip"
+        (click)="openKeyDialog()"
+      >
+        <mat-icon>key</mat-icon>
+        Connect Gemini key
+      </button>
+    }
+  </div>
+</header>
+
+<main class="layout">
+  @if (!hasKey()) {
+    <dea-no-key-empty-state />
+  } @else {
+    <div class="layout-grid">
+      <div class="cc-col">
+        <dea-command-center />
+      </div>
+      <aside class="ct-col">
+        <dea-control-tower />
+      </aside>
+    </div>
+
+    <section class="dashboard-row">
+      @if (hasContent() || isBusy()) {
+        <dea-generative-renderer />
+      } @else {
+        <div class="dashboard-empty">
+          <mat-icon aria-hidden="true">dashboard_customize</mat-icon>
+          <p>
+            Ready when you are. Submit a brief above and three Gemini agents will compose your event
+            dashboard live.
+          </p>
+        </div>
+      }
+    </section>
+  }
+</main>
+
+<footer class="footer">
+  <span>Agentic UI with Angular. Runs entirely in your browser.</span>
+</footer>

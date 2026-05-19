@@ -1,0 +1,123 @@
+:host {
+  display: block;
+}
+
+.empty {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 80px 24px;
+  text-align: center;
+
+  .badge {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--dea-accent) 35%, transparent),
+      color-mix(in srgb, var(--dea-accent) 8%, transparent)
+    );
+    border: 1px solid var(--dea-border-strong);
+    box-shadow: 0 0 0 8px var(--dea-accent-glow);
+
+    mat-icon {
+      font-size: 32px;
+      width: 32px;
+      height: 32px;
+      color: var(--dea-accent);
+    }
+  }
+
+  h2 {
+    font-size: clamp(1.5rem, 3vw, 1.9rem);
+    margin: 0 0 12px;
+    line-height: 1.25;
+  }
+
+  p {
+    color: var(--dea-fg-muted);
+    line-height: 1.55;
+    margin: 0 auto 28px;
+    max-width: 480px;
+
+    code {
+      background: var(--dea-bg-elev-2);
+      border: 1px solid var(--dea-border);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 0.9em;
+    }
+  }
+
+  .actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .connect-cta {
+    height: 48px;
+    padding-inline: 22px;
+    border-radius: 999px;
+    font-weight: 600;
+
+    mat-icon {
+      margin-right: 8px;
+    }
+  }
+
+  .studio-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    color: var(--dea-fg-muted);
+    text-decoration: none;
+    border-bottom: 1px dashed var(--dea-border-strong);
+    padding-bottom: 1px;
+    transition: color var(--dea-transition);
+
+    &:hover {
+      color: var(--dea-accent);
+    }
+
+    mat-icon {
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
+    }
+  }
+}
+
+@media (max-width: 720px) {
+  .empty {
+    padding: 48px 16px;
+
+    .badge {
+      width: 60px;
+      height: 60px;
+      margin-bottom: 16px;
+
+      mat-icon {
+        font-size: 26px;
+        width: 26px;
+        height: 26px;
+      }
+    }
+
+    p {
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    .connect-cta {
+      width: 100%;
+      max-width: 320px;
+    }
+  }
+}

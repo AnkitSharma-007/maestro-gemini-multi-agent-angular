@@ -1,0 +1,56 @@
+@if (!expanded()) {
+  <button
+    mat-stroked-button
+    type="button"
+    class="trigger"
+    (click)="expand()"
+    [disabled]="inFlight()"
+    [matTooltip]="inFlight() ? 'Agent is still working…' : 'Refine this widget'"
+    matTooltipPosition="above"
+  >
+    @if (inFlight()) {
+      <mat-spinner diameter="16" />
+    } @else {
+      <mat-icon>auto_fix_high</mat-icon>
+    }
+    <span>Refine</span>
+  </button>
+} @else {
+  <form
+    class="expanded"
+    (ngSubmit)="apply()"
+    (keydown)="onKeyDown($event)"
+  >
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="field">
+      <mat-label>Adjustment for this widget</mat-label>
+      <input
+        matInput
+        type="text"
+        [ngModel]="draft()"
+        (ngModelChange)="draft.set($event)"
+        name="refineDraft"
+        autocomplete="off"
+        placeholder="e.g. shrink the venue line item by 30%"
+        cdkFocusInitial
+        autofocus
+      />
+    </mat-form-field>
+    <div class="actions">
+      <button
+        mat-button
+        type="button"
+        (click)="collapse()"
+      >
+        Cancel
+      </button>
+      <button
+        mat-flat-button
+        color="primary"
+        type="submit"
+        [disabled]="!draft().trim() || inFlight()"
+      >
+        Apply
+      </button>
+    </div>
+  </form>
+}

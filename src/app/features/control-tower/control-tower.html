@@ -1,0 +1,60 @@
+<section class="tower" aria-label="Mission control timeline">
+  <header class="tower-head">
+    <div class="title-line">
+      <span class="dot" [class.live]="globalStatus() === 'planning' || globalStatus() === 'running'"></span>
+      <h2>Mission Control</h2>
+    </div>
+    <span class="state-pill state-{{ globalStatus() }}">
+      {{ globalStatus() | uppercase }}
+    </span>
+  </header>
+
+  @if (plannerRationale()) {
+    <p class="rationale">
+      <mat-icon aria-hidden="true">format_quote</mat-icon>
+      {{ plannerRationale() }}
+    </p>
+  } @else if (globalStatus() === 'idle') {
+    <p class="rationale placeholder">
+      Submit a brief and watch four agents collaborate live — the planner here, then three specialists in parallel below.
+    </p>
+  }
+
+  <ul class="rows">
+    @for (row of rows(); track row.meta.id) {
+      <li class="row" [class.row-live]="row.isLive" [class.row-done]="row.state.status === 'done'" [class.row-error]="row.state.status === 'error'">
+        <div class="rail">
+          @if (row.isLive) {
+            <mat-spinner diameter="18" />
+          } @else if (row.state.status === 'done') {
+            <mat-icon class="check" aria-hidden="true">check_circle</mat-icon>
+          } @else if (row.state.status === 'error') {
+            <mat-icon class="err" aria-hidden="true">error</mat-icon>
+          } @else if (row.state.status === 'pending') {
+            <mat-icon class="pending" aria-hidden="true">schedule</mat-icon>
+          } @else {
+            <mat-icon class="idle" aria-hidden="true">{{ row.meta.icon }}</mat-icon>
+          }
+        </div>
+        <div class="info">
+          <div class="info-top">
+            <span class="role">{{ row.meta.label }}</span>
+            @if (row.duration !== undefined) {
+              <span class="duration">{{ formatDuration(row.duration) }}</span>
+            }
+          </div>
+          <div class="info-bottom">
+            <span class="status status-{{ row.state.status }}">
+              {{ statusLabel(row.state.status) }}
+            </span>
+            @if (row.state.status === 'error' && row.state.error) {
+              <span class="err-detail" [title]="row.state.error">
+                {{ row.state.error }}
+              </span>
+            }
+          </div>
+        </div>
+      </li>
+    }
+  </ul>
+</section>

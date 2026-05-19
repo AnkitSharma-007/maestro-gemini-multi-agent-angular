@@ -1,0 +1,72 @@
+<article class="card">
+  <header class="head">
+    <div class="badge">
+      <mat-icon aria-hidden="true">{{ meta().icon }}</mat-icon>
+      <span class="agent-label">{{ meta().label }}</span>
+    </div>
+
+    @if (mode() === 'real' && title()) {
+      <h3 class="title">{{ title() }}</h3>
+    }
+
+    @if (mode() === 'ghost') {
+      <span class="status-pill ghost-pill">
+        @if (status() === 'pending') { Queued }
+        @else if (status() === 'thinking') { Thinking… }
+        @else if (status() === 'streaming') { Streaming… }
+        @else { Preparing… }
+      </span>
+    } @else if (mode() === 'real') {
+      @if (isStreaming()) {
+        <span class="status-pill ghost-pill">Refining…</span>
+      } @else {
+        <span class="status-pill done-pill">
+          <mat-icon aria-hidden="true">check_circle</mat-icon>
+          Done
+        </span>
+      }
+    } @else {
+      <span class="status-pill error-pill">
+        <mat-icon aria-hidden="true">error</mat-icon>
+        Failed
+      </span>
+    }
+  </header>
+
+  @if (mode() === 'real' && isStreaming()) {
+    <mat-progress-bar mode="indeterminate" class="streaming-bar" />
+  }
+
+  <div class="body">
+    @switch (mode()) {
+      @case ('ghost') {
+        <div class="ghost-content">
+          <div class="shimmer block-lg"></div>
+          <div class="shimmer block-md"></div>
+          <div class="shimmer block-sm"></div>
+          <div class="shimmer block-md"></div>
+        </div>
+      }
+      @case ('real') {
+        <ng-content select="[body]"></ng-content>
+      }
+      @case ('error') {
+        <div class="error-block">
+          <mat-icon aria-hidden="true">cloud_off</mat-icon>
+          <p>
+            {{ errorMessage() ?? 'This agent could not finish. Other widgets continued without it.' }}
+          </p>
+        </div>
+      }
+    }
+  </div>
+
+  @if (mode() === 'real') {
+    <footer class="foot">
+      <ng-content select="[footer]"></ng-content>
+      <div class="refine-row">
+        <dea-refine-bar [widgetId]="widgetId()" />
+      </div>
+    </footer>
+  }
+</article>

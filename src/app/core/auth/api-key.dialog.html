@@ -1,0 +1,94 @@
+<h2 mat-dialog-title class="dialog-title">
+  <mat-icon aria-hidden="true">key</mat-icon>
+  Connect your Gemini API key
+</h2>
+
+<mat-dialog-content class="dialog-body">
+  <p class="privacy">
+    Your API key is stored only in this browser's <code>localStorage</code>. It
+    is sent directly from your browser to Google's Gemini API and never reaches
+    any server we control. You can clear it any time from the top bar.
+  </p>
+
+  <mat-form-field appearance="outline" class="key-field">
+    <mat-label>Gemini API key</mat-label>
+    <input
+      matInput
+      [type]="showKey() ? 'text' : 'password'"
+      [ngModel]="draftKey()"
+      (ngModelChange)="draftKey.set($event)"
+      autocomplete="off"
+      spellcheck="false"
+      [disabled]="busy()"
+      placeholder="AIza..."
+    />
+    <button
+      mat-icon-button
+      matSuffix
+      type="button"
+      (click)="toggleVisibility()"
+      [attr.aria-label]="showKey() ? 'Hide key' : 'Show key'"
+      tabindex="-1"
+    >
+      <mat-icon>{{ showKey() ? 'visibility_off' : 'visibility' }}</mat-icon>
+    </button>
+    <mat-hint>
+      Don't have one?
+      <a [href]="studioUrl" target="_blank" rel="noopener">
+        Get a free key at Google AI Studio
+      </a>
+    </mat-hint>
+  </mat-form-field>
+
+  <div class="quality-row">
+    <span class="quality-label">Quality mode</span>
+    <mat-button-toggle-group
+      [value]="mode()"
+      (change)="onModeChange($event.value)"
+      [disabled]="busy()"
+      hideSingleSelectionIndicator
+    >
+      <mat-button-toggle value="fast">
+        <mat-icon>bolt</mat-icon>
+        Fast
+      </mat-button-toggle>
+      <mat-button-toggle value="quality">
+        <mat-icon>auto_awesome</mat-icon>
+        Quality
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
+  <p class="quality-hint">
+    {{ mode() === 'fast'
+      ? 'gemini-3-flash-preview — best for the parallel-streaming demo feel.'
+      : 'gemini-3-pro-preview — higher-quality output, requires Pro access on your key.' }}
+  </p>
+
+  @if (errorMsg()) {
+    <div class="error" role="alert">
+      <mat-icon>error</mat-icon>
+      <span>{{ errorMsg() }}</span>
+    </div>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions class="dialog-actions" align="end">
+  @if (hasExistingKey()) {
+    <button mat-button color="warn" (click)="onClear()" [disabled]="busy()">
+      Clear saved key
+    </button>
+  }
+  <span class="spacer"></span>
+  <button mat-button mat-dialog-close [disabled]="busy()">Cancel</button>
+  <button
+    mat-flat-button
+    color="primary"
+    (click)="onSave()"
+    [disabled]="busy() || !draftKey().trim()"
+  >
+    @if (busy()) {
+      <mat-spinner diameter="18" />
+    }
+    <span>{{ busy() ? 'Validating…' : 'Save & Validate' }}</span>
+  </button>
+</mat-dialog-actions>

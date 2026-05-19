@@ -1,0 +1,45 @@
+<dea-widget-shell mode="real" [widgetId]="widgetId()" [title]="title()">
+  <div body class="body">
+    <header class="hero">
+      <div class="hero-text">
+        <p class="city">
+          <mat-icon aria-hidden="true">location_on</mat-icon>
+          {{ config().city }}
+        </p>
+        <h2 class="venue-name">{{ config().name }}</h2>
+      </div>
+    </header>
+
+    <div class="stats">
+      <div class="stat">
+        <span class="stat-label">Capacity</span>
+        <span class="stat-value">
+          <mat-icon aria-hidden="true">groups</mat-icon>
+          {{ config().capacity | number }}
+        </span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Estimated cost</span>
+        <span class="stat-value">
+          <mat-icon aria-hidden="true">payments</mat-icon>
+          {{ config().estimatedCost | currency: 'USD':'symbol-narrow':'1.0-0' }}
+        </span>
+      </div>
+    </div>
+
+    @if (config().amenities.length) {
+      <mat-chip-set class="amenities" aria-label="Amenities">
+        @for (a of config().amenities; track a) {
+          <mat-chip disableRipple>
+            <mat-icon matChipAvatar>check</mat-icon>
+            {{ a }}
+          </mat-chip>
+        }
+      </mat-chip-set>
+    }
+
+    <p class="rationale">{{ config().rationale }}</p>
+
+    <dea-citation-chips [citations]="citations()" />
+  </div>
+</dea-widget-shell>

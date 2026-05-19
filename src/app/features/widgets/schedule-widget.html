@@ -1,0 +1,64 @@
+<dea-widget-shell mode="real" [widgetId]="widgetId()" [title]="title()">
+  <div body class="body">
+    @if (days().length === 0) {
+      <p class="empty">No days returned.</p>
+    } @else if (days().length === 1) {
+      <ng-container *ngTemplateOutlet="dayTpl; context: { $implicit: days()[0] }" />
+    } @else {
+      <mat-tab-group
+        [selectedIndex]="0"
+        animationDuration="220ms"
+        mat-stretch-tabs="false"
+        class="day-tabs"
+      >
+        @for (day of days(); track day.dayLabel; let i = $index) {
+          <mat-tab>
+            <ng-template mat-tab-label>
+              <span class="tab-label">
+                <span class="num">{{ i + 1 }}</span>
+                {{ day.dayLabel }}
+              </span>
+            </ng-template>
+            <ng-container *ngTemplateOutlet="dayTpl; context: { $implicit: day }" />
+          </mat-tab>
+        }
+      </mat-tab-group>
+    }
+
+    @if ((citations()?.length ?? 0) > 0) {
+      <dea-citation-chips [citations]="citations()" />
+    }
+  </div>
+</dea-widget-shell>
+
+<ng-template #dayTpl let-day>
+  <div class="day">
+    @if (day.date) {
+      <p class="date">{{ day.date }}</p>
+    }
+    <ol class="sessions">
+      @for (s of day.sessions; track s.title + s.time) {
+        <li class="session">
+          <div class="time">
+            <mat-icon aria-hidden="true">schedule</mat-icon>
+            <span>{{ s.time }}</span>
+          </div>
+          <div class="meta">
+            <p class="title">{{ s.title }}</p>
+            <div class="sub">
+              @if (s.speaker) {
+                <span class="speaker">
+                  <mat-icon aria-hidden="true">person</mat-icon>
+                  {{ s.speaker }}
+                </span>
+              }
+              @if (s.track) {
+                <span class="track">{{ s.track }}</span>
+              }
+            </div>
+          </div>
+        </li>
+      }
+    </ol>
+  </div>
+</ng-template>

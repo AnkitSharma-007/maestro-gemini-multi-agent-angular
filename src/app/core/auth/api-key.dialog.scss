@@ -1,0 +1,143 @@
+:host {
+  display: block;
+  width: 100%;
+  min-width: min(380px, 92vw);
+  max-width: min(560px, 92vw);
+}
+
+.dialog-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+
+  mat-icon {
+    color: var(--dea-accent);
+  }
+}
+
+.dialog-body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-block: 8px 4px;
+}
+
+.privacy {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--dea-fg-muted);
+
+  code {
+    background: var(--dea-bg-elev-2);
+    border: 1px solid var(--dea-border);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 12px;
+  }
+}
+
+.key-field {
+  width: 100%;
+
+  ::ng-deep .mat-mdc-form-field-hint-wrapper {
+    font-size: 12px;
+  }
+
+  a {
+    text-decoration: underline;
+  }
+}
+
+.quality-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.quality-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--dea-fg-muted);
+  min-width: 92px;
+}
+
+.quality-hint {
+  margin: -4px 0 0;
+  font-size: 12px;
+  color: var(--dea-fg-muted);
+  line-height: 1.4;
+}
+
+.error {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  background: color-mix(in srgb, var(--dea-error) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--dea-error) 35%, transparent);
+  border-radius: var(--dea-radius-md);
+  color: var(--dea-error);
+  font-size: 13px;
+  line-height: 1.5;
+  min-width: 0;
+
+  span {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    margin-top: 1px;
+    flex-shrink: 0;
+  }
+}
+
+.dialog-actions {
+  gap: 8px;
+
+  .spacer {
+    flex: 1;
+  }
+
+  button mat-spinner {
+    margin-right: 8px;
+    display: inline-block;
+  }
+}
+
+@media (max-width: 480px) {
+  .dialog-body {
+    gap: 14px;
+  }
+
+  .privacy {
+    font-size: 12px;
+  }
+
+  .quality-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .quality-label {
+    min-width: 0;
+  }
+
+  .dialog-actions {
+    flex-wrap: wrap;
+
+    .spacer {
+      display: none;
+    }
+  }
+}

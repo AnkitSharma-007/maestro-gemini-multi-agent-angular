@@ -1,0 +1,62 @@
+<section class="cc">
+  <form class="prompt-card" (ngSubmit)="submit()" (keydown)="onKeyDown($event)">
+    <div class="prompt-head">
+      <div class="prompt-title">
+        <mat-icon aria-hidden="true">stars</mat-icon>
+        <span>Architect a dashboard</span>
+      </div>
+      <span class="hint">⌘ / Ctrl + Enter to dispatch</span>
+    </div>
+
+    <mat-form-field appearance="outline" class="prompt-field" subscriptSizing="dynamic">
+      <mat-label>Describe your event</mat-label>
+      <textarea
+        matInput
+        rows="3"
+        [ngModel]="prompt()"
+        (ngModelChange)="prompt.set($event)"
+        name="prompt"
+        [disabled]="isBusy()"
+        placeholder="e.g. 3-day Agentic AI conference, Bengaluru, 1,200 attendees, ₹2.5cr budget…"
+        autocomplete="off"
+        spellcheck="true"
+      ></textarea>
+    </mat-form-field>
+
+    <div class="prompt-actions">
+      <button
+        type="button"
+        mat-stroked-button
+        class="hero-chip"
+        (click)="applyHero()"
+        [disabled]="isBusy()"
+      >
+        <mat-icon>auto_awesome</mat-icon>
+        Try the demo prompt
+      </button>
+      <button
+        type="submit"
+        mat-flat-button
+        color="primary"
+        class="dispatch-btn"
+        [disabled]="!canSubmit()"
+      >
+        <mat-icon>rocket_launch</mat-icon>
+        Architect Dashboard
+      </button>
+    </div>
+  </form>
+
+  @if (isBusy()) {
+    <div class="banner" role="status" aria-live="polite">
+      <mat-progress-bar mode="indeterminate" />
+      <span class="banner-text">
+        @if (globalStatus() === 'planning') {
+          Planner is decomposing your brief…
+        } @else {
+          Specialists are streaming results in parallel…
+        }
+      </span>
+    </div>
+  }
+</section>

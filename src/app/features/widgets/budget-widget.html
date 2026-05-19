@@ -1,0 +1,43 @@
+<dea-widget-shell mode="real" [widgetId]="widgetId()" [title]="title()">
+  <div body class="body-grid">
+    <div class="totals">
+      <div class="total-row">
+        <span class="label">Total budget</span>
+        <span class="amount">
+          {{ config().totalBudget | currency: config().currency:'symbol-narrow':'1.0-0' }}
+        </span>
+      </div>
+      <div class="total-row dim">
+        <span class="label">Sum of line items</span>
+        <span class="amount">
+          {{ subtotal() | currency: config().currency:'symbol-narrow':'1.0-0' }}
+        </span>
+      </div>
+    </div>
+
+    <ul class="lines">
+      @for (row of rows(); track row.category) {
+        <li class="line">
+          <div class="line-row">
+            <span class="cat" [matTooltip]="row.rationale" matTooltipPosition="left">
+              {{ row.category }}
+            </span>
+            <span class="amt">
+              {{ row.amount | currency: config().currency:'symbol-narrow':'1.0-0' }}
+            </span>
+          </div>
+          <mat-progress-bar
+            mode="determinate"
+            [value]="row.pct"
+            [attr.aria-label]="row.category + ' allocation'"
+          />
+          <p class="rationale">{{ row.rationale }}</p>
+        </li>
+      }
+    </ul>
+
+    @if ((citations()?.length ?? 0) > 0) {
+      <dea-citation-chips [citations]="citations()" />
+    }
+  </div>
+</dea-widget-shell>
