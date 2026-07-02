@@ -22,12 +22,21 @@ describe('usageFromMetadata', () => {
 });
 
 describe('estimateCostUsd', () => {
-  it('applies flash preview rates', () => {
-    const cost = estimateCostUsd('gemini-3-flash-preview', {
+  it('applies flash rates', () => {
+    const cost = estimateCostUsd('gemini-3.5-flash', {
       promptTokens: 1_000_000,
       outputTokens: 1_000_000,
       totalTokens: 2_000_000,
     });
-    expect(cost).toBeCloseTo(3.5, 5);
+    expect(cost).toBeCloseTo(10.5, 5);
+  });
+
+  it('applies pro rates', () => {
+    const cost = estimateCostUsd('gemini-3.1-pro-preview', {
+      promptTokens: 1_000_000,
+      outputTokens: 1_000_000,
+      totalTokens: 2_000_000,
+    });
+    expect(cost).toBeCloseTo(14, 5);
   });
 });

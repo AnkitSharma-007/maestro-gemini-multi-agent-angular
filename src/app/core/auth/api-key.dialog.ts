@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  signal,
-} from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   MatDialogActions,
@@ -22,7 +17,6 @@ import { ApiKeyService, QualityMode } from './api-key.service';
 
 @Component({
   selector: 'dea-api-key-dialog',
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     FormsModule,
     MatDialogTitle,

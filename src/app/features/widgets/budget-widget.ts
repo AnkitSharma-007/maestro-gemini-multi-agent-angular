@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  input,
-} from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -21,7 +16,6 @@ interface RenderRow {
 
 @Component({
   selector: 'dea-budget-widget',
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CurrencyPipe,
     MatProgressBarModule,

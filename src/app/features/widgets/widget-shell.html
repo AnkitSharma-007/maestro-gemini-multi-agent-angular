@@ -56,7 +56,8 @@
   }
 
   <div class="body">
-    @switch (mode()) {
+    @let shellMode = mode();
+    @switch (shellMode) {
       @case ('ghost') {
         <div class="ghost-content">
           <div class="shimmer block-lg"></div>
@@ -71,11 +72,28 @@
       @case ('error') {
         <div class="error-block">
           <mat-icon aria-hidden="true">cloud_off</mat-icon>
-          <p>
-            {{ errorMessage() ?? 'This agent could not finish. Other widgets continued without it.' }}
-          </p>
+          @if (appError(); as err) {
+            <p class="error-title">{{ err.title }}</p>
+            <p class="error-msg" [matTooltip]="err.detail ?? ''" matTooltipPosition="above">
+              {{ err.message }}
+            </p>
+            @if (canRetry()) {
+              <button
+                mat-stroked-button
+                type="button"
+                class="retry-btn"
+                (click)="retry()"
+              >
+                <mat-icon>refresh</mat-icon>
+                Retry
+              </button>
+            }
+          } @else {
+            <p>This agent could not finish. Other widgets continued without it.</p>
+          }
         </div>
       }
+      @default never;
     }
   </div>
 

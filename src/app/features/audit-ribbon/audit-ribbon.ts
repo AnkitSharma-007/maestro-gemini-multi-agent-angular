@@ -1,14 +1,11 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  inject,
-} from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { AgentOrchestrator } from '../../core/ai/agent-orchestrator.service';
+import { toAppError } from '../../core/errors/app-error';
+import { NotificationService } from '../../core/errors/notification.service';
 import { AgentStore } from '../../core/state/agent.store';
 import {
   AuditIssue,
@@ -20,7 +17,6 @@ import {
 
 @Component({
   selector: 'dea-audit-ribbon',
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatButtonModule,
     MatIconModule,
@@ -33,6 +29,7 @@ import {
 export class AuditRibbon {
   private readonly store = inject(AgentStore);
   private readonly orchestrator = inject(AgentOrchestrator);
+  private readonly notifications = inject(NotificationService);
 
   protected readonly auditorStatus = computed(
     () => this.store.agentStates().auditor.status,
@@ -47,6 +44,10 @@ export class AuditRibbon {
 
   protected readonly isAuditorErrored = computed(
     () => this.auditorStatus() === 'error',
+  );
+
+  protected readonly auditorError = computed(
+    () => this.store.agentStates().auditor.error ?? null,
   );
 
   protected readonly isAuditorDone = computed(
@@ -91,7 +92,11 @@ export class AuditRibbon {
     try {
       await this.orchestrator.applyFixIt(issue);
     } catch (err) {
-      if (err instanceof MissingApiKeyError) return;
+      if (err instanceof MissingApiKeyError) {
+        this.notifications.warn('Please connect a Gemini API key first.');
+        return;
+      }
+      this.notifications.errorFrom(toAppError(err));
     }
   }
 
@@ -104,7 +109,11 @@ export class AuditRibbon {
     try {
       await this.orchestrator.reAudit();
     } catch (err) {
-      if (err instanceof MissingApiKeyError) return;
+      if (err instanceof MissingApiKeyError) {
+        this.notifications.warn('Please connect a Gemini API key first.');
+        return;
+      }
+      this.notifications.errorFrom(toAppError(err));
     }
   }
 }

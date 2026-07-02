@@ -1,21 +1,15 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  effect,
-  inject,
-  signal,
-} from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { AgentOrchestrator } from '../../core/ai/agent-orchestrator.service';
 import { ApiKeyService } from '../../core/auth/api-key.service';
+import { toAppError } from '../../core/errors/app-error';
+import { NotificationService } from '../../core/errors/notification.service';
 import { AgentStore } from '../../core/state/agent.store';
 import { PromptDraftService } from '../../core/state/prompt-draft.service';
 import {
@@ -23,11 +17,10 @@ import {
   SAMPLE_PROMPTS,
   type SamplePrompt,
 } from '../../core/demo/sample-prompts';
-import { classifyApiError, MissingApiKeyError } from '../../core/types/agent.types';
+import { MissingApiKeyError } from '../../core/types/agent.types';
 
 @Component({
   selector: 'dea-command-center',
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     FormsModule,
     MatButtonModule,
@@ -44,7 +37,7 @@ export class CommandCenter {
   private readonly orchestrator = inject(AgentOrchestrator);
   private readonly apiKeys = inject(ApiKeyService);
   private readonly store = inject(AgentStore);
-  private readonly snack = inject(MatSnackBar);
+  private readonly notifications = inject(NotificationService);
   private readonly drafts = inject(PromptDraftService);
 
   protected readonly prompt = signal<string>('');
@@ -92,13 +85,10 @@ export class CommandCenter {
       await this.orchestrator.run(text);
     } catch (err) {
       if (err instanceof MissingApiKeyError) {
-        this.notify('Please connect a Gemini API key first.', 'warn');
+        this.notifications.warn('Please connect a Gemini API key first.');
         return;
       }
-      const cls = classifyApiError(err);
-      const msg =
-        err instanceof Error ? err.message : 'Something went wrong dispatching the agents.';
-      this.notify(`${cls === 'auth' ? 'Auth: ' : ''}${msg}`, 'error');
+      this.notifications.errorFrom(toAppError(err));
     }
   }
 
@@ -107,12 +97,5 @@ export class CommandCenter {
       event.preventDefault();
       void this.submit();
     }
-  }
-
-  private notify(message: string, kind: 'warn' | 'error'): void {
-    this.snack.open(message, 'Dismiss', {
-      duration: 6000,
-      panelClass: [`dea-snack-${kind}`],
-    });
   }
 }

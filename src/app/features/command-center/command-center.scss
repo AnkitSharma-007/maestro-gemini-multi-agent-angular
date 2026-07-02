@@ -210,10 +210,7 @@
 .dispatch-btn {
   @include m.pill($height: 44px, $padding-x: 22px, $font-size: 13px, $font-weight: 600);
   letter-spacing: 0.02em;
-  @include m.brand-pill;
-  box-shadow:
-    0 6px 18px -6px var(--dea-accent-glow),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  @include m.brand-solid;
   transition:
     transform var(--dea-transition),
     box-shadow var(--dea-transition),
@@ -225,9 +222,7 @@
 
   &:hover:not([disabled]) {
     transform: translateY(-1px);
-    box-shadow:
-      0 12px 28px -6px var(--dea-accent-glow),
-      inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    box-shadow: var(--dea-shadow-1);
   }
 
   &[disabled] {

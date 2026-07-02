@@ -1,10 +1,9 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Component } from '@angular/core';
 import { SPECIALIST_IDS } from '../../core/types/agent.types';
 import { WidgetSlot } from './widget-slot';
 
 @Component({
   selector: 'dea-generative-renderer',
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [WidgetSlot],
   template: `
     <section class="grid" aria-label="Generated event dashboard">

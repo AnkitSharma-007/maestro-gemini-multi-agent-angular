@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   computed,
@@ -12,7 +11,10 @@ import {
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { AgentOrchestrator } from '../../core/ai/agent-orchestrator.service';
+import { toAppError } from '../../core/errors/app-error';
+import { NotificationService } from '../../core/errors/notification.service';
 import { AgentStore } from '../../core/state/agent.store';
 import {
   AgentStatus,
@@ -26,9 +28,8 @@ type ShellMode = 'ghost' | 'real' | 'error';
 
 @Component({
   selector: 'dea-widget-shell',
-  changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
-  imports: [MatButtonModule, MatIconModule, MatProgressBarModule, RefineBar],
+  imports: [MatButtonModule, MatIconModule, MatProgressBarModule, MatTooltipModule, RefineBar],
   templateUrl: './widget-shell.html',
   styleUrl: './widget-shell.scss',
   host: {
@@ -41,6 +42,7 @@ type ShellMode = 'ghost' | 'real' | 'error';
 export class WidgetShell {
   private readonly store = inject(AgentStore);
   private readonly orchestrator = inject(AgentOrchestrator);
+  private readonly notifications = inject(NotificationService);
   private readonly cdr = inject(ChangeDetectorRef);
 
   readonly mode = input.required<ShellMode>();
@@ -61,8 +63,15 @@ export class WidgetShell {
     this.store.staleWidgets().includes(this.widgetId()),
   );
 
-  protected readonly errorMessage = computed(
+  protected readonly appError = computed(
     () => this.store.agentStates()[this.widgetId()].error ?? null,
+  );
+
+  protected readonly canRetry = computed(
+    () =>
+      (this.appError()?.retryable ?? false) &&
+      !this.store.isBusy() &&
+      !!this.store.getAgentBrief(this.widgetId()),
   );
 
   protected readonly pulsing = signal<boolean>(false);
@@ -98,7 +107,24 @@ export class WidgetShell {
     try {
       await this.orchestrator.rippleUpdate(this.widgetId());
     } catch (err) {
-      if (err instanceof MissingApiKeyError) return;
+      if (err instanceof MissingApiKeyError) {
+        this.notifications.warn('Please connect a Gemini API key first.');
+        return;
+      }
+      this.notifications.errorFrom(toAppError(err));
+    }
+  }
+
+  protected async retry(): Promise<void> {
+    if (this.store.isBusy()) return;
+    try {
+      await this.orchestrator.retryAgent(this.widgetId());
+    } catch (err) {
+      if (err instanceof MissingApiKeyError) {
+        this.notifications.warn('Please connect a Gemini API key first.');
+        return;
+      }
+      this.notifications.errorFrom(toAppError(err));
     }
   }
 }

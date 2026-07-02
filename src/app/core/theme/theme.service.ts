@@ -9,7 +9,8 @@ const safeRead = (): ThemeMode | null => {
   try {
     const v = localStorage.getItem(STORAGE_KEY);
     return v === 'light' || v === 'dark' ? v : null;
-  } catch {
+  } catch (e) {
+    console.warn('[ThemeService] Could not read theme from localStorage.', e);
     return null;
   }
 };
@@ -17,8 +18,9 @@ const safeRead = (): ThemeMode | null => {
 const safeWrite = (mode: ThemeMode): void => {
   try {
     localStorage.setItem(STORAGE_KEY, mode);
-  } catch {
-    /* ignore */
+  } catch (e) {
+    // Non-critical: the theme still applies this session, it just won't persist.
+    console.warn('[ThemeService] Could not persist theme to localStorage.', e);
   }
 };
 

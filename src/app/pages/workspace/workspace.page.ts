@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute } from '@angular/router';
@@ -13,7 +13,6 @@ import { GenerativeRenderer } from '../../features/renderer/generative-renderer'
 
 @Component({
   selector: 'dea-workspace-page',
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatIconModule,
     CommandCenter,

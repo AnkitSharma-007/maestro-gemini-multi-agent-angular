@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -17,12 +16,13 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { AgentOrchestrator } from '../../core/ai/agent-orchestrator.service';
+import { toAppError } from '../../core/errors/app-error';
+import { NotificationService } from '../../core/errors/notification.service';
 import { AgentStore } from '../../core/state/agent.store';
-import { SpecialistId } from '../../core/types/agent.types';
+import { MissingApiKeyError, SpecialistId } from '../../core/types/agent.types';
 
 @Component({
   selector: 'dea-refine-bar',
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     FormsModule,
     MatButtonModule,
@@ -38,6 +38,7 @@ import { SpecialistId } from '../../core/types/agent.types';
 export class RefineBar {
   private readonly orchestrator = inject(AgentOrchestrator);
   private readonly store = inject(AgentStore);
+  private readonly notifications = inject(NotificationService);
 
   readonly widgetId = input.required<SpecialistId>();
 
@@ -80,8 +81,14 @@ export class RefineBar {
     this.collapse();
     try {
       await this.orchestrator.refine(this.widgetId(), text);
-    } catch {
-      /* errors surface via agent state */
+    } catch (err) {
+      if (err instanceof MissingApiKeyError) {
+        this.notifications.warn('Please connect a Gemini API key first.');
+        return;
+      }
+      // Agent-level failures already surface via agent state; this only
+      // catches unexpected orchestration errors.
+      this.notifications.errorFrom(toAppError(err));
     }
   }
 

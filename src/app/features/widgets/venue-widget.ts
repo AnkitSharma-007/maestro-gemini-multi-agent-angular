@@ -1,8 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  input,
-} from '@angular/core';
+import { Component, input } from '@angular/core';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
@@ -13,7 +9,6 @@ import { SpecialistId } from '../../core/types/agent.types';
 
 @Component({
   selector: 'dea-venue-widget',
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CurrencyPipe,
     DecimalPipe,

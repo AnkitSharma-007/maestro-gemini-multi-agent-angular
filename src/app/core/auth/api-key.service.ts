@@ -1,5 +1,7 @@
-import { computed, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { loadGenaiSdk } from '../ai/genai-loader';
+import { extractGeminiErrorMessage } from '../errors/app-error';
+import { NotificationService } from '../errors/notification.service';
 
 const KEY_STORAGE = 'dea.geminiApiKey';
 const MODEL_STORAGE = 'dea.geminiModel';
@@ -7,65 +9,46 @@ const MODEL_STORAGE = 'dea.geminiModel';
 export type QualityMode = 'fast' | 'quality';
 
 export const MODEL_FOR_MODE: Record<QualityMode, string> = {
-  fast: 'gemini-3-flash-preview',
-  quality: 'gemini-3-pro-preview',
+  fast: 'gemini-3.5-flash',
+  quality: 'gemini-3.1-pro-preview',
 };
 
-type ValidateResult =
-  | { ok: true }
-  | { ok: false; reason: string };
+type ValidateResult = { ok: true } | { ok: false; reason: string };
 
-const isQualityMode = (v: unknown): v is QualityMode =>
-  v === 'fast' || v === 'quality';
+const isQualityMode = (v: unknown): v is QualityMode => v === 'fast' || v === 'quality';
 
 const safeRead = (storageKey: string): string | null => {
   try {
     return localStorage.getItem(storageKey);
-  } catch {
+  } catch (e) {
+    console.warn(`[ApiKeyService] Could not read "${storageKey}" from localStorage.`, e);
     return null;
   }
 };
 
-const safeWrite = (storageKey: string, value: string): void => {
+/** Best-effort persist. Returns false when storage is unavailable (e.g. private mode). */
+const safeWrite = (storageKey: string, value: string): boolean => {
   try {
     localStorage.setItem(storageKey, value);
-  } catch {
-    /* ignore */
+    return true;
+  } catch (e) {
+    console.warn(`[ApiKeyService] Could not persist "${storageKey}" to localStorage.`, e);
+    return false;
   }
 };
 
 const safeRemove = (storageKey: string): void => {
   try {
     localStorage.removeItem(storageKey);
-  } catch {
-    /* ignore */
+  } catch (e) {
+    console.warn(`[ApiKeyService] Could not remove "${storageKey}" from localStorage.`, e);
   }
-};
-
-/**
- * Gemini's SDK rethrows the raw HTTP body as the Error message, so for a 400
- * we get a wall of JSON like `got status: 400 Bad Request. {"error":{...}}`.
- * Pull out the human-readable `error.message` so we can surface a single
- * readable line in the dialog.
- */
-const extractGeminiErrorMessage = (raw: string): string => {
-  const fallback = raw.trim();
-  const start = fallback.indexOf('{');
-  if (start < 0) return fallback;
-  try {
-    const parsed = JSON.parse(fallback.slice(start)) as {
-      error?: { message?: string; status?: string };
-    };
-    const inner = parsed?.error?.message?.trim();
-    if (inner) return inner;
-  } catch {
-    /* not JSON — fall through */
-  }
-  return fallback;
 };
 
 @Injectable({ providedIn: 'root' })
 export class ApiKeyService {
+  private readonly notifications = inject(NotificationService);
+
   private readonly _key = signal<string | null>(safeRead(KEY_STORAGE));
   private readonly _mode = signal<QualityMode>(
     isQualityMode(safeRead(MODEL_STORAGE)) ? (safeRead(MODEL_STORAGE) as QualityMode) : 'fast',
@@ -88,8 +71,13 @@ export class ApiKeyService {
       this.clearKey();
       return;
     }
-    safeWrite(KEY_STORAGE, trimmed);
+    const persisted = safeWrite(KEY_STORAGE, trimmed);
     this._key.set(trimmed);
+    if (!persisted) {
+      this.notifications.warn(
+        "Your API key is active for this session but couldn't be saved. You may need to re-enter it after reloading.",
+      );
+    }
   }
 
   clearKey(): void {
@@ -118,10 +106,7 @@ export class ApiKeyService {
       }
       return { ok: true };
     } catch (e: unknown) {
-      const raw =
-        e instanceof Error && e.message
-          ? e.message
-          : 'Could not validate this API key.';
+      const raw = e instanceof Error && e.message ? e.message : 'Could not validate this API key.';
       return { ok: false, reason: extractGeminiErrorMessage(raw) };
     }
   }

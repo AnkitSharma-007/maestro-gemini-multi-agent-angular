@@ -101,10 +101,25 @@ describe('AgentStore', () => {
 
     it('resets completedAt when an agent restarts from error', () => {
       store.setAgentStatus('budget', 'thinking');
-      store.setAgentStatus('budget', 'error', 'boom');
+      store.setAgentStatus('budget', 'error', {
+        kind: 'unknown',
+        title: 'Something went wrong',
+        message: 'boom',
+        retryable: true,
+      });
       store.setAgentStatus('budget', 'thinking');
       const state = store.agentStates().budget;
       expect(state.completedAt).toBeUndefined();
+    });
+
+    it('stores the AppError on the agent state when it fails', () => {
+      store.setAgentStatus('budget', 'error', {
+        kind: 'quota',
+        title: 'Rate limit reached',
+        message: 'slow down',
+        retryable: true,
+      });
+      expect(store.agentStates().budget.error?.kind).toBe('quota');
     });
 
     it('reports "done" when a specialist finished without errors', () => {
@@ -116,7 +131,7 @@ describe('AgentStore', () => {
 
   describe('telemetry', () => {
     it('records usage and recomputes run totals', () => {
-      const model = 'gemini-3-flash-preview';
+      const model = 'gemini-3.5-flash';
       store.recordAgentUsage(
         'budget',
         { promptTokens: 1000, outputTokens: 200, totalTokens: 1200 },
@@ -138,7 +153,7 @@ describe('AgentStore', () => {
     });
 
     it('accumulates usage across multiple recordings on the same agent', () => {
-      const model = 'gemini-3-flash-preview';
+      const model = 'gemini-3.5-flash';
       store.recordAgentUsage(
         'budget',
         { promptTokens: 100, outputTokens: 50, totalTokens: 150 },
@@ -216,7 +231,7 @@ describe('AgentStore', () => {
       store.recordAgentUsage(
         'budget',
         { promptTokens: 10, outputTokens: 5, totalTokens: 15 },
-        'gemini-3-flash-preview',
+        'gemini-3.5-flash',
       );
 
       store.resetForRun();

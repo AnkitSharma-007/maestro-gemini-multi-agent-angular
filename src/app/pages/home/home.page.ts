@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { Router, RouterLink } from '@angular/router';
@@ -114,7 +114,6 @@ const FEATURES: readonly FeatureCard[] = [
 
 @Component({
   selector: 'dea-home-page',
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [MatButtonModule, MatIconModule, RouterLink],
   templateUrl: './home.page.html',
   styleUrl: './home.page.scss',

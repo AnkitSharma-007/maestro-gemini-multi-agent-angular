@@ -247,6 +247,19 @@ dea-widget-shell {
     font-size: 13px;
     line-height: 1.55;
   }
+
+  .error-title {
+    font-weight: 600;
+    color: var(--dea-error);
+  }
+
+  .error-msg {
+    color: var(--dea-fg-muted);
+  }
+
+  .retry-btn {
+    margin-top: 2px;
+  }
 }
 
 @keyframes shellEnter {

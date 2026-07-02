@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   ComponentRef,
   computed,
@@ -21,7 +20,6 @@ type SlotMode = 'ghost' | 'real' | 'error';
 
 @Component({
   selector: 'dea-widget-slot',
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [WidgetShell],
   template: `
     @if (mode() === 'real') {

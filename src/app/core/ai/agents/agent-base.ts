@@ -8,6 +8,7 @@ import type {
   ThinkingLevel as SdkThinkingLevel,
 } from '@google/genai';
 import { loadGenaiSdk } from '../genai-loader';
+import { toAppError } from '../../errors/app-error';
 import { usageFromMetadata } from '../gemini-pricing';
 import { buildRefinePrompt } from '../gemini.prompts';
 import { ApiKeyService } from '../../auth/api-key.service';
@@ -104,8 +105,7 @@ export abstract class AgentBase {
     } catch (err) {
       const usage = usageFromMetadata(lastUsage);
       if (usage) this.store.recordAgentUsage(this.id, usage, model);
-      const message = err instanceof Error ? err.message : String(err);
-      this.store.setAgentStatus(this.id, 'error', message);
+      this.store.setAgentStatus(this.id, 'error', toAppError(err));
       throw err;
     }
   }

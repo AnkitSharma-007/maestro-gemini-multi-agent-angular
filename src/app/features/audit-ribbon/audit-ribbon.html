@@ -10,7 +10,9 @@
   } @else if (isAuditorErrored()) {
     <div class="state state-unavailable" role="status">
       <mat-icon aria-hidden="true">rule</mat-icon>
-      <span>Auditor unavailable</span>
+      <span [matTooltip]="auditorError()?.detail ?? ''" matTooltipPosition="above">
+        {{ auditorError()?.message ?? 'Auditor unavailable' }}
+      </span>
       <button
         mat-stroked-button
         type="button"

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -6,7 +6,6 @@ import { Citation } from '../../core/types/widget.types';
 
 @Component({
   selector: 'dea-citation-chips',
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [MatChipsModule, MatIconModule, MatTooltipModule],
   template: `
     @if (visibleChips().length > 0) {

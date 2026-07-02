@@ -228,7 +228,8 @@
 .info-bottom {
   display: flex;
   align-items: center;
-  gap: 8px;
+  flex-wrap: wrap;
+  gap: 4px 8px;
   font-size: 12px;
   min-width: 0;
 }
@@ -245,13 +246,11 @@
 }
 
 .err-detail {
-  flex: 1;
+  flex-basis: 100%;
   min-width: 0;
   font-size: 11px;
+  line-height: 1.45;
   color: var(--dea-error);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   opacity: 0.85;
 }
 

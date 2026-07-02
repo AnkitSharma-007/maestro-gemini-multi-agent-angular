@@ -1,11 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  effect,
-  inject,
-  signal,
-} from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { UpperCasePipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -13,6 +6,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { AgentOrchestrator } from '../../core/ai/agent-orchestrator.service';
 import { formatCostUsd, formatTokenCount } from '../../core/ai/telemetry-format';
+import { toAppError } from '../../core/errors/app-error';
+import { NotificationService } from '../../core/errors/notification.service';
 import { AgentStore } from '../../core/state/agent.store';
 import type { AgentTelemetry } from '../../core/types/telemetry.types';
 import {
@@ -58,7 +53,6 @@ const STATUS_LABEL: Record<AgentStatus, string> = {
 
 @Component({
   selector: 'dea-control-tower',
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     UpperCasePipe,
     MatButtonModule,
@@ -72,6 +66,7 @@ const STATUS_LABEL: Record<AgentStatus, string> = {
 export class ControlTower {
   private readonly store = inject(AgentStore);
   private readonly orchestrator = inject(AgentOrchestrator);
+  private readonly notifications = inject(NotificationService);
 
   /** Bumps every 500ms while any agent is active and the tab is visible. */
   private readonly liveTick = signal(0);
@@ -157,7 +152,11 @@ export class ControlTower {
     try {
       await this.orchestrator.retryAgent(id);
     } catch (err) {
-      if (err instanceof MissingApiKeyError) return;
+      if (err instanceof MissingApiKeyError) {
+        this.notifications.warn('Please connect a Gemini API key first.');
+        return;
+      }
+      this.notifications.errorFrom(toAppError(err));
     }
   }
 }

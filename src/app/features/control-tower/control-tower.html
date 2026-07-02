@@ -66,11 +66,6 @@
             <span class="status status-{{ row.state.status }}">
               {{ statusLabel(row.state.status) }}
             </span>
-            @if (row.state.status === 'error' && row.state.error) {
-              <span class="err-detail" [title]="row.state.error">
-                {{ row.state.error }}
-              </span>
-            }
             @if (row.canRetry) {
               <button
                 mat-stroked-button
@@ -81,6 +76,15 @@
                 <mat-icon>refresh</mat-icon>
                 Retry
               </button>
+            }
+            @if (row.state.error; as err) {
+              <span
+                class="err-detail"
+                [matTooltip]="err.detail ?? ''"
+                matTooltipPosition="above"
+              >
+                {{ err.message }}
+              </span>
             }
           </div>
         </div>

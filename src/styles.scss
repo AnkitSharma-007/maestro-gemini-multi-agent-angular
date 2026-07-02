@@ -29,6 +29,7 @@ html {
   --dea-accent: #b69aff;
   --dea-accent-2: #6ee7f2;
   --dea-accent-glow: rgba(182, 154, 255, 0.42);
+  --dea-accent-solid: #6d4aff;
   --dea-success: #5dd6a4;
   --dea-warn: #ffb86b;
   --dea-error: #ff6b8a;
@@ -84,6 +85,7 @@ html.theme-light {
   --dea-accent: #6b3df5;
   --dea-accent-2: #11a8b5;
   --dea-accent-glow: rgba(107, 61, 245, 0.22);
+  --dea-accent-solid: #6b3df5;
   --dea-success: #0e8a5b;
   --dea-warn: #b86a07;
   --dea-error: #c2335a;
@@ -217,6 +219,34 @@ code {
 
 html.theme-light .cdk-overlay-dark-backdrop {
   background: rgba(20, 24, 40, 0.42);
+}
+
+.dea-snack-error,
+.dea-snack-warn,
+.dea-snack-success,
+.dea-snack-info {
+  --mdc-snackbar-container-color: var(--dea-bg-solid-2);
+  --mdc-snackbar-supporting-text-color: var(--dea-fg);
+  --mat-snack-bar-button-color: var(--dea-accent);
+
+  .mdc-snackbar__surface {
+    border: 1px solid var(--dea-border-strong);
+    border-left-width: 4px;
+    box-shadow: var(--dea-shadow-2);
+  }
+}
+
+.dea-snack-error .mdc-snackbar__surface {
+  border-left-color: var(--dea-error);
+}
+.dea-snack-warn .mdc-snackbar__surface {
+  border-left-color: var(--dea-warn);
+}
+.dea-snack-success .mdc-snackbar__surface {
+  border-left-color: var(--dea-success);
+}
+.dea-snack-info .mdc-snackbar__surface {
+  border-left-color: var(--dea-accent-2);
 }
 
 @media (prefers-reduced-motion: reduce) {

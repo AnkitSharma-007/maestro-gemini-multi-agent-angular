@@ -211,13 +211,11 @@
   min-height: 32px;
   padding: 0 14px;
   border-radius: 999px;
-  @include m.brand-pill;
+  @include m.brand-solid;
   font-weight: 600;
-  box-shadow: 0 4px 12px -4px var(--dea-accent-glow);
 
   &:disabled {
     opacity: 0.55;
-    box-shadow: none;
   }
 }
 

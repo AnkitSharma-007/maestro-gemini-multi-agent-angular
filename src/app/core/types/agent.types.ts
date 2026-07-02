@@ -1,3 +1,5 @@
+import type { AppError } from '../errors/app-error';
+
 export type AgentId = 'planner' | 'auditor' | 'budget' | 'schedule' | 'venue';
 
 export type SpecialistId = Exclude<AgentId, 'planner' | 'auditor'>;
@@ -30,7 +32,7 @@ export interface AgentState {
   status: AgentStatus;
   startedAt?: number;
   completedAt?: number;
-  error?: string;
+  error?: AppError;
 }
 
 export interface AgentBrief {

@@ -21,6 +21,7 @@ import {
   DynamicComponentConfig,
   WidgetEntry,
 } from '../types/widget.types';
+import type { AppError } from '../errors/app-error';
 
 type WidgetMap = Record<WidgetEntry['id'], WidgetEntry | undefined>;
 type AgentStateMap = Record<AgentId, AgentState>;
@@ -147,7 +148,7 @@ export class AgentStore {
   }
 
   /** `startedAt` is captured on the first active phase; `completedAt` on terminal. */
-  setAgentStatus(id: AgentId, status: AgentStatus, error?: string): void {
+  setAgentStatus(id: AgentId, status: AgentStatus, error?: AppError): void {
     this.patchAgentState(id, status, error);
   }
 
@@ -188,7 +189,7 @@ export class AgentStore {
     return this.agentTelemetry()[id];
   }
 
-  private patchAgentState(id: AgentId, status: AgentStatus, error?: string): void {
+  private patchAgentState(id: AgentId, status: AgentStatus, error?: AppError): void {
     this.agentStates.update((state) => {
       const current = state[id] ?? { id, status: 'idle' as AgentStatus };
       const isActive = status === 'thinking' || status === 'streaming';
