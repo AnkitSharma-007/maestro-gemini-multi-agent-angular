@@ -27,11 +27,9 @@
     <input
       matInput
       [type]="showKey() ? 'text' : 'password'"
-      [ngModel]="draftKey()"
-      (ngModelChange)="draftKey.set($event)"
+      [formField]="keyField"
       autocomplete="off"
       spellcheck="false"
-      [disabled]="busy()"
       placeholder="AIza…"
     />
     <button

@@ -4,13 +4,13 @@
       <div class="total-row">
         <span class="label">Total budget</span>
         <span class="amount">
-          {{ config().totalBudget | currency: config().currency:'symbol-narrow':'1.0-0' }}
+          {{ config().totalBudget | currency: currencyCode():'symbol-narrow':'1.0-0' }}
         </span>
       </div>
       <div class="total-row dim">
         <span class="label">Sum of line items</span>
         <span class="amount">
-          {{ subtotal() | currency: config().currency:'symbol-narrow':'1.0-0' }}
+          {{ subtotal() | currency: currencyCode():'symbol-narrow':'1.0-0' }}
         </span>
       </div>
     </div>
@@ -23,7 +23,7 @@
               {{ row.category }}
             </span>
             <span class="amt">
-              {{ row.amount | currency: config().currency:'symbol-narrow':'1.0-0' }}
+              {{ row.amount | currency: currencyCode():'symbol-narrow':'1.0-0' }}
             </span>
           </div>
           <mat-progress-bar

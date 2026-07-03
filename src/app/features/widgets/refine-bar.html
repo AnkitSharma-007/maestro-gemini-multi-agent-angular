@@ -4,8 +4,8 @@
     type="button"
     class="trigger"
     (click)="expand()"
-    [disabled]="inFlight()"
-    [matTooltip]="inFlight() ? 'Agent is still working…' : 'Refine this widget'"
+    [disabled]="disabled()"
+    [matTooltip]="triggerTooltip()"
     matTooltipPosition="above"
   >
     @if (inFlight()) {
@@ -18,7 +18,7 @@
 } @else {
   <form
     class="expanded"
-    (ngSubmit)="apply()"
+    (submit)="$event.preventDefault(); apply()"
     (keydown)="onKeyDown($event)"
   >
     <mat-form-field appearance="outline" subscriptSizing="dynamic" class="field">
@@ -27,9 +27,7 @@
         #draftInput
         matInput
         type="text"
-        [ngModel]="draft()"
-        (ngModelChange)="draft.set($event)"
-        name="refineDraft"
+        [formField]="draftField"
         autocomplete="off"
         placeholder="e.g. shrink the venue line item by 30%"
         [attr.aria-label]="'Adjustment for ' + widgetId() + ' widget'"
@@ -47,7 +45,7 @@
         mat-flat-button
         color="primary"
         type="submit"
-        [disabled]="!draft().trim() || inFlight()"
+        [disabled]="!draft().trim() || disabled()"
       >
         Apply
       </button>

@@ -3,6 +3,7 @@ import {
   AuditableWidgets,
   buildAuditorContents,
   buildRefinePrompt,
+  buildRepairPrompt,
 } from './gemini.prompts';
 import type { DynamicComponentConfig } from '../types/widget.types';
 
@@ -24,6 +25,33 @@ describe('buildRefinePrompt', () => {
     const adjustment = 'Add a contingency line of 10% of total — IMPORTANT.';
     const prompt = buildRefinePrompt({}, adjustment);
     expect(prompt).toContain(adjustment);
+  });
+});
+
+describe('buildRepairPrompt', () => {
+  it('lists each weakness as a bullet', () => {
+    const prompt = buildRepairPrompt([
+      'Missing a contingency line item',
+      'Total does not match the sum of line items',
+    ]);
+    expect(prompt).toContain('- Missing a contingency line item');
+    expect(prompt).toContain('- Total does not match the sum of line items');
+  });
+
+  it('ignores blank weaknesses', () => {
+    const prompt = buildRepairPrompt(['Real weakness', '   ', '']);
+    expect(prompt).toContain('- Real weakness');
+    expect(prompt).not.toMatch(/-\s*\n/);
+  });
+
+  it('falls back to a generic instruction when there are no weaknesses', () => {
+    const prompt = buildRepairPrompt([]);
+    expect(prompt).toMatch(/improve the overall quality/i);
+  });
+
+  it('tells the agent to preserve what is already correct', () => {
+    const prompt = buildRepairPrompt(['x']);
+    expect(prompt).toMatch(/keep everything that is already correct/i);
   });
 });
 

@@ -61,6 +61,26 @@
       animation: livePulse 1.6s ease-out infinite;
     }
   }
+
+  .head-right {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .heal-toggle {
+    width: 32px;
+    height: 32px;
+    color: var(--dea-fg-subtle);
+
+    mat-icon {
+      @include m.sized-icon(18);
+    }
+
+    &.on {
+      color: var(--dea-accent);
+    }
+  }
 }
 
 .state-pill {

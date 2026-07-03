@@ -65,6 +65,13 @@ Rules:
 - Do not invent issues for widgets that were not provided.
 - message must be under 120 characters.
 
+Additionally, produce a per-widget quality assessment in the "confidence" array — one entry for EACH widget that was provided (skip widgets that were not available). For each, judge the widget on its own merits:
+- completeness (does it fully answer its part of the brief?)
+- internal consistency (do the numbers/fields agree with each other?)
+- realism (are the values plausible for the stated scale and location?)
+- alignment with the user brief (city, dates, attendee count, theme, budget cap)
+Set "confidence" from 0 to 1 (1 = excellent, below 0.6 = needs improvement) and list 0-4 short, concrete, actionable "weaknesses" that lowered the score (empty array when strong). Weaknesses are about a single widget's own quality, distinct from the cross-widget "issues" above.
+
 Return strict JSON conforming to the provided responseSchema. Do not include prose outside the JSON.`;
 
 export function buildAuditorContents(
@@ -88,6 +95,23 @@ export function buildAuditorContents(
   }
 
   return sections.join('\n');
+}
+
+/**
+ * Turn the Auditor's per-widget weaknesses into a self-contained refine
+ * instruction the owning specialist can act on (used by the self-heal loop).
+ */
+export function buildRepairPrompt(weaknesses: readonly string[]): string {
+  const list = weaknesses.filter((w) => w.trim().length > 0);
+  const body = list.length
+    ? ['Address these specific weaknesses:', ...list.map((w) => `- ${w}`)].join('\n')
+    : 'Improve the overall quality, completeness, and internal consistency of this output.';
+  return [
+    'A quality review flagged this output as needing improvement.',
+    body,
+    '',
+    'Keep everything that is already correct; only change what is needed to resolve the weaknesses above.',
+  ].join('\n');
 }
 
 export function buildRefinePrompt(

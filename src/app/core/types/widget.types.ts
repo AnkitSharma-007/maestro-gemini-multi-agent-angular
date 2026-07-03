@@ -59,12 +59,6 @@ interface SpecialistResultMap {
   venue: VenueResult;
 }
 
-const RENDER_TYPE_BY_ID = {
-  budget: 'render_budget',
-  schedule: 'render_schedule',
-  venue: 'render_venue',
-} as const satisfies Record<SpecialistId, DynamicComponentConfig['type']>;
-
 export function intoComponentConfig<T extends SpecialistId>(
   id: T,
   result: SpecialistResultMap[T],

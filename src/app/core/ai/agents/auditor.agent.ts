@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Service } from '@angular/core';
 import { AgentBase, AgentRunResult } from './agent-base';
 import { AUDITOR_SCHEMA } from '../gemini.schemas';
 import {
@@ -8,7 +8,7 @@ import {
 } from '../gemini.prompts';
 import { AgentId, AuditorOutput } from '../../types/agent.types';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class AuditorAgent extends AgentBase {
   readonly id: AgentId = 'auditor';
 

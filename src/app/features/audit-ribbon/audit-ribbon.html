@@ -55,7 +55,7 @@
           type="button"
           class="reaudit-btn"
           (click)="reAudit()"
-          [disabled]="isAuditorRunning()"
+          [disabled]="busy()"
         >
           <mat-icon>refresh</mat-icon>
           Re-audit

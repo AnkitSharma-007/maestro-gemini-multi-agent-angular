@@ -1,4 +1,4 @@
-import { computed, effect, Injectable, signal } from '@angular/core';
+import { computed, effect, Service, signal } from '@angular/core';
 
 type ThemeMode = 'light' | 'dark';
 
@@ -33,7 +33,7 @@ const detectInitial = (): ThemeMode => {
   return 'dark';
 };
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class ThemeService {
   private readonly _mode = signal<ThemeMode>(detectInitial());
 

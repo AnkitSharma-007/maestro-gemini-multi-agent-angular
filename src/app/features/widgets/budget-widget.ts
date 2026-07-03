@@ -6,6 +6,7 @@ import { CitationChips } from './citation-chips';
 import { WidgetShell } from './widget-shell';
 import { BudgetConfig, Citation } from '../../core/types/widget.types';
 import { SpecialistId } from '../../core/types/agent.types';
+import { safeCurrencyCode } from '../../core/format/currency';
 
 interface RenderRow {
   category: string;
@@ -31,6 +32,8 @@ export class BudgetWidget {
   readonly title = input.required<string>();
   readonly config = input.required<BudgetConfig>();
   readonly citations = input<Citation[] | undefined>(undefined);
+
+  protected readonly currencyCode = computed(() => safeCurrencyCode(this.config().currency));
 
   protected readonly rows = computed<RenderRow[]>(() => {
     const cfg = this.config();

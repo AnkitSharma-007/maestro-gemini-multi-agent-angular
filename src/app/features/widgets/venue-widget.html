@@ -22,7 +22,7 @@
         <span class="stat-label">Estimated cost</span>
         <span class="stat-value">
           <mat-icon aria-hidden="true">payments</mat-icon>
-          {{ config().estimatedCost | currency: (config().currency || 'USD'):'symbol-narrow':'1.0-0' }}
+          {{ config().estimatedCost | currency: currencyCode():'symbol-narrow':'1.0-0' }}
         </span>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { disabled, form, FormField } from '@angular/forms/signals';
 import {
   MatDialogActions,
   MatDialogClose,
@@ -18,7 +18,7 @@ import { ApiKeyService, QualityMode } from './api-key.service';
 @Component({
   selector: 'dea-api-key-dialog',
   imports: [
-    FormsModule,
+    FormField,
     MatDialogTitle,
     MatDialogContent,
     MatDialogActions,
@@ -43,6 +43,11 @@ export class ApiKeyDialog {
   protected readonly busy = signal<boolean>(false);
   protected readonly errorMsg = signal<string | null>(null);
   protected readonly hasExistingKey = this.apiKeys.hasKey;
+
+  /** Signal Forms field over the key; disabled by the schema while validating. */
+  protected readonly keyField = form(this.draftKey, (p) => {
+    disabled(p, { when: () => this.busy() });
+  });
 
   protected readonly studioUrl = 'https://aistudio.google.com/apikey';
 

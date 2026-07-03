@@ -235,7 +235,7 @@ export const VENUE_SCHEMA: Schema = {
 
 export const AUDITOR_SCHEMA: Schema = {
   type: Type.OBJECT,
-  required: ['summary', 'issues'],
+  required: ['summary', 'issues', 'confidence'],
   description:
     'Cross-widget consistency audit of an event-planning dashboard.',
   properties: {
@@ -244,6 +244,38 @@ export const AUDITOR_SCHEMA: Schema = {
       description:
         'One-line headline (under 120 chars), e.g. "2 issues across budget and venue" ' +
         'or "Looks consistent. No cross-widget issues found."',
+    },
+    confidence: {
+      type: Type.ARRAY,
+      description:
+        'One quality assessment per widget that was provided. Do not include ' +
+        'entries for widgets that were not available.',
+      items: {
+        type: Type.OBJECT,
+        required: ['targetId', 'confidence', 'weaknesses'],
+        properties: {
+          targetId: {
+            type: Type.STRING,
+            format: 'enum',
+            enum: ['budget', 'schedule', 'venue'],
+            description: 'Which specialist widget this assessment scores.',
+          },
+          confidence: {
+            type: Type.NUMBER,
+            description:
+              'Quality score from 0 to 1 judging completeness, internal ' +
+              'consistency, realism, and alignment with the user brief. ' +
+              '1 = excellent, below 0.6 = needs improvement.',
+          },
+          weaknesses: {
+            type: Type.ARRAY,
+            description:
+              '0-4 short, concrete weaknesses that lowered the score. Empty ' +
+              'array when the widget is strong. Each item is directly actionable.',
+            items: { type: Type.STRING },
+          },
+        },
+      },
     },
     issues: {
       type: Type.ARRAY,

@@ -7,9 +7,28 @@
       ></span>
       <h2>Mission Control</h2>
     </div>
-    <span class="state-pill state-{{ globalStatus() }}">
-      {{ globalStatus() | uppercase }}
-    </span>
+    <div class="head-right">
+      <button
+        mat-icon-button
+        type="button"
+        class="heal-toggle"
+        [class.on]="autoHeal()"
+        (click)="toggleAutoHeal()"
+        [matTooltip]="
+          autoHeal()
+            ? 'Auto-repair low-confidence widgets: On (uses extra Gemini calls)'
+            : 'Auto-repair low-confidence widgets: Off'
+        "
+        matTooltipPosition="below"
+        [attr.aria-pressed]="autoHeal()"
+        aria-label="Toggle auto-repair of low-confidence widgets"
+      >
+        <mat-icon>auto_fix_high</mat-icon>
+      </button>
+      <span class="state-pill state-{{ globalStatus() }}">
+        {{ globalStatus() | uppercase }}
+      </span>
+    </div>
   </header>
 
   @if (plannerRationale()) {

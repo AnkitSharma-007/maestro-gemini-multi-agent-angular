@@ -8,7 +8,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { form, FormField } from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -24,7 +24,7 @@ import { MissingApiKeyError, SpecialistId } from '../../core/types/agent.types';
 @Component({
   selector: 'dea-refine-bar',
   imports: [
-    FormsModule,
+    FormField,
     MatButtonModule,
     MatFormFieldModule,
     MatIconModule,
@@ -44,6 +44,7 @@ export class RefineBar {
 
   protected readonly expanded = signal<boolean>(false);
   protected readonly draft = signal<string>('');
+  protected readonly draftField = form(this.draft);
 
   private readonly draftInput = viewChild<ElementRef<HTMLInputElement>>('draftInput');
 
@@ -65,8 +66,20 @@ export class RefineBar {
     return s === 'thinking' || s === 'streaming' || s === 'pending';
   });
 
+  /** Any pipeline activity anywhere — refining now would abort in-flight work. */
+  protected readonly busy = this.store.isBusy;
+
+  /** Refine is unavailable while this widget or the pipeline is working. */
+  protected readonly disabled = computed(() => this.inFlight() || this.busy());
+
+  protected readonly triggerTooltip = computed(() => {
+    if (this.inFlight()) return 'Agent is still working…';
+    if (this.busy()) return 'Wait for the current run to finish';
+    return 'Refine this widget';
+  });
+
   protected expand(): void {
-    if (this.inFlight()) return;
+    if (this.disabled()) return;
     this.expanded.set(true);
   }
 
@@ -77,7 +90,7 @@ export class RefineBar {
 
   protected async apply(): Promise<void> {
     const text = this.draft().trim();
-    if (!text || this.inFlight()) return;
+    if (!text || this.disabled()) return;
     this.collapse();
     try {
       await this.orchestrator.refine(this.widgetId(), text);

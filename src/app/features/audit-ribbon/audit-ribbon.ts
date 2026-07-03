@@ -31,6 +31,9 @@ export class AuditRibbon {
   private readonly orchestrator = inject(AgentOrchestrator);
   private readonly notifications = inject(NotificationService);
 
+  /** Any pipeline activity — applying a fix or re-auditing now would abort it. */
+  protected readonly busy = this.store.isBusy;
+
   protected readonly auditorStatus = computed(
     () => this.store.agentStates().auditor.status,
   );
@@ -84,7 +87,7 @@ export class AuditRibbon {
   }
 
   protected canApply(issue: AuditIssue): boolean {
-    return !this.isAuditorRunning() && !this.isTargetBusy(issue.targetId);
+    return !this.busy() && !this.isTargetBusy(issue.targetId);
   }
 
   protected async applyFix(issue: AuditIssue): Promise<void> {
@@ -105,7 +108,7 @@ export class AuditRibbon {
   }
 
   protected async reAudit(): Promise<void> {
-    if (this.isAuditorRunning()) return;
+    if (this.busy()) return;
     try {
       await this.orchestrator.reAudit();
     } catch (err) {

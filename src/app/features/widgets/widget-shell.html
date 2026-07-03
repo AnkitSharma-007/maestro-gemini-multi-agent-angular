@@ -19,10 +19,30 @@
     } @else if (mode() === 'real') {
       @if (isStreaming()) {
         <span class="status-pill ghost-pill">Refining…</span>
+      } @else if (hasInlineError()) {
+        <span class="status-pill error-pill">
+          <mat-icon aria-hidden="true">error</mat-icon>
+          Update failed
+        </span>
       } @else {
         <span class="status-pill done-pill">
           <mat-icon aria-hidden="true">check_circle</mat-icon>
           Done
+        </span>
+      }
+      @if (!hasInlineError() && confidenceTier(); as tier) {
+        <span
+          class="status-pill confidence-pill"
+          [class.conf-high]="tier === 'high'"
+          [class.conf-medium]="tier === 'medium'"
+          [class.conf-low]="tier === 'low'"
+          [matTooltip]="confidenceTooltip()"
+          matTooltipClass="dea-pre-tooltip"
+          matTooltipPosition="above"
+          [attr.aria-label]="'Quality confidence ' + confidencePct() + ' percent'"
+        >
+          <mat-icon aria-hidden="true">{{ confidenceIcon() }}</mat-icon>
+          {{ confidencePct() }}%
         </span>
       }
     } @else {
@@ -37,6 +57,37 @@
     <mat-progress-bar mode="indeterminate" class="streaming-bar" />
   }
 
+  @if (mode() === 'real' && hasInlineError()) {
+    <div class="update-error-banner" role="alert">
+      <mat-icon aria-hidden="true">error</mat-icon>
+      <div class="ue-text">
+        <span class="ue-title">Update failed — showing the previous version.</span>
+        @if (appError(); as err) {
+          <span
+            class="ue-msg"
+            [matTooltip]="err.detail ?? ''"
+            matTooltipPosition="above"
+          >
+            {{ err.message }}
+          </span>
+        }
+      </div>
+      @if (canRetry()) {
+        <button
+          mat-flat-button
+          color="primary"
+          type="button"
+          class="ue-retry-btn"
+          (click)="retry()"
+          [disabled]="busy()"
+        >
+          <mat-icon>refresh</mat-icon>
+          Retry
+        </button>
+      }
+    </div>
+  }
+
   @if (mode() === 'real' && isStale()) {
     <div class="stale-banner" role="status">
       <mat-icon aria-hidden="true">sync_problem</mat-icon>
@@ -47,7 +98,7 @@
         type="button"
         class="stale-update-btn"
         (click)="updateFromRipple()"
-        [disabled]="isStreaming()"
+        [disabled]="busy()"
       >
         <mat-icon>refresh</mat-icon>
         Update

@@ -1,11 +1,11 @@
-import { Injectable } from '@angular/core';
+import { Service } from '@angular/core';
 import { SpecialistAgentBase } from './agent-base';
 import { SCHEDULE_SCHEMA } from '../gemini.schemas';
 import { SCHEDULE_SYSTEM } from '../gemini.prompts';
 import { AgentId } from '../../types/agent.types';
 import { ScheduleResult } from '../../types/widget.types';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class ScheduleAgent extends SpecialistAgentBase<ScheduleResult> {
   readonly id: AgentId = 'schedule';
   protected readonly systemInstruction = SCHEDULE_SYSTEM;

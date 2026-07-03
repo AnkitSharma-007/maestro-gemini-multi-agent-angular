@@ -1,10 +1,10 @@
-import { Injectable } from '@angular/core';
+import { Service } from '@angular/core';
 import { AgentBase } from './agent-base';
 import { PLANNER_SCHEMA } from '../gemini.schemas';
 import { PLANNER_SYSTEM } from '../gemini.prompts';
 import { AgentId, PlannerOutput, SPECIALIST_IDS } from '../../types/agent.types';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class PlannerAgent extends AgentBase {
   readonly id: AgentId = 'planner';
 

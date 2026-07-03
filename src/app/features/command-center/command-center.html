@@ -1,5 +1,9 @@
 <section class="cc">
-  <form class="prompt-card" (ngSubmit)="submit()" (keydown)="onKeyDown($event)">
+  <form
+    class="prompt-card"
+    (submit)="$event.preventDefault(); submit()"
+    (keydown)="onKeyDown($event)"
+  >
     <div class="aurora" aria-hidden="true"></div>
 
     <div class="prompt-head">
@@ -21,16 +25,64 @@
       <textarea
         matInput
         rows="4"
-        [ngModel]="prompt()"
-        (ngModelChange)="prompt.set($event)"
-        name="prompt"
-        [disabled]="isBusy()"
+        [formField]="promptField"
         placeholder="e.g. 3-day Agentic AI conference, Bengaluru, 1,200 attendees, ₹2.5cr budget…"
         autocomplete="off"
         spellcheck="true"
         aria-label="Event brief"
       ></textarea>
     </mat-form-field>
+
+    @if (!isBusy()) {
+      <div class="intake-row" aria-label="Start from voice or a file">
+        @if (voiceSupported) {
+          <button
+            type="button"
+            mat-stroked-button
+            class="intake-chip"
+            [class.listening]="listening()"
+            (click)="toggleVoice()"
+            [disabled]="interpreting()"
+            [matTooltip]="listening() ? 'Stop dictation' : 'Dictate your brief'"
+            matTooltipPosition="above"
+          >
+            <mat-icon>mic</mat-icon>
+            {{ listening() ? 'Listening…' : 'Speak' }}
+          </button>
+        }
+        <button
+          type="button"
+          mat-stroked-button
+          class="intake-chip"
+          (click)="fileInput.click()"
+          [disabled]="interpreting()"
+          matTooltip="Attach an image or PDF to draft a brief"
+          matTooltipPosition="above"
+        >
+          <mat-icon>attach_file</mat-icon>
+          Attach image / PDF
+        </button>
+        <input
+          #fileInput
+          type="file"
+          [accept]="accept"
+          hidden
+          (change)="onFileSelected($event)"
+        />
+
+        @if (interpreting()) {
+          <span class="intake-status" role="status" aria-live="polite">
+            <span class="banner-spinner" aria-hidden="true"></span>
+            Reading {{ attachmentName() }}…
+          </span>
+        } @else if (attachmentName()) {
+          <span class="intake-status attached">
+            <mat-icon aria-hidden="true">check_circle</mat-icon>
+            {{ attachmentName() }}
+          </span>
+        }
+      </div>
+    }
 
     @if (!isBusy() && samplePrompts.length) {
       <div class="samples" aria-label="Sample prompts">
@@ -68,8 +120,18 @@
     }
 
     <div class="prompt-actions">
-      <span class="char-count" aria-live="polite">
-        {{ charCount() }} chars
+      <span
+        class="char-count"
+        [class.near]="nearLimit()"
+        [class.over]="overLimit()"
+        aria-live="polite"
+      >
+        {{ charCount() }} / {{ maxPromptChars }} chars
+        @if (overLimit()) {
+          <span class="char-hint">— trim to submit</span>
+        } @else if (nearLimit()) {
+          <span class="char-hint">— approaching limit</span>
+        }
       </span>
       <div class="action-buttons">
         @if (prompt().length > 0 && !isBusy()) {

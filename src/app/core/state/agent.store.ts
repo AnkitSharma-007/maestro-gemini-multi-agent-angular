@@ -1,4 +1,4 @@
-import { computed, Injectable, signal } from '@angular/core';
+import { computed, Service, signal } from '@angular/core';
 import type { AuditableWidgets } from '../ai/gemini.prompts';
 import {
   AgentId,
@@ -7,6 +7,7 @@ import {
   AuditIssue,
   SpecialistId,
   SPECIALIST_IDS,
+  WidgetConfidence,
 } from '../types/agent.types';
 import { estimateCostUsd } from '../ai/gemini-pricing';
 import {
@@ -26,6 +27,23 @@ import type { AppError } from '../errors/app-error';
 type WidgetMap = Record<WidgetEntry['id'], WidgetEntry | undefined>;
 type AgentStateMap = Record<AgentId, AgentState>;
 
+/**
+ * Auditor issue ids are model-generated free-form strings and can collide.
+ * Angular's `@for … track issue.id` throws NG0955 on duplicates, so we make
+ * ids unique (and non-empty) before they ever reach the template.
+ */
+function dedupeIssueIds(issues: readonly AuditIssue[]): AuditIssue[] {
+  const seen = new Set<string>();
+  return issues.map((issue) => {
+    const base = issue.id?.trim() || 'issue';
+    let id = base;
+    let n = 2;
+    while (seen.has(id)) id = `${base}-${n++}`;
+    seen.add(id);
+    return id === issue.id ? issue : { ...issue, id };
+  });
+}
+
 const initialAgentStates = (): AgentStateMap => ({
   planner: { id: 'planner', status: 'idle' },
   auditor: { id: 'auditor', status: 'idle' },
@@ -42,13 +60,14 @@ const initialWidgets = (): WidgetMap => ({
 
 type GlobalStatus = 'idle' | 'planning' | 'running' | 'done' | 'error';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class AgentStore {
   readonly widgets = signal<WidgetMap>(initialWidgets());
   readonly agentStates = signal<AgentStateMap>(initialAgentStates());
   readonly plannerRationale = signal<string | null>(null);
   readonly auditIssues = signal<AuditIssue[]>([]);
   readonly auditSummary = signal<string | null>(null);
+  readonly widgetConfidence = signal<Partial<Record<SpecialistId, WidgetConfidence>>>({});
   readonly lastUserIntent = signal<string | null>(null);
   readonly staleWidgets = signal<readonly SpecialistId[]>([]);
   readonly agentBriefs = signal<Partial<Record<AgentId, string>>>({});
@@ -105,8 +124,13 @@ export class AgentStore {
 
     const anyDone = specialists.some((a) => a.status === 'done');
     const anyError = specialists.some((a) => a.status === 'error');
+    const plannerError = states.planner.status === 'error';
+
+    // Partial success still counts as "done" — a failed widget shows its own
+    // error shell. Only report "error" when nothing rendered but something
+    // failed (all specialists errored, or the planner itself errored).
     if (anyDone) return 'done';
-    if (anyError && states.planner.status === 'error') return 'error';
+    if (anyError || plannerError) return 'error';
 
     return 'done';
   });
@@ -119,6 +143,12 @@ export class AgentStore {
   readonly hasContent = computed(() => {
     const w = this.widgets();
     return SPECIALIST_IDS.some((id) => !!w[id]);
+  });
+
+  /** True when any specialist ended in error, even if others succeeded. */
+  readonly hasFailures = computed(() => {
+    const states = this.agentStates();
+    return SPECIALIST_IDS.some((id) => states[id].status === 'error');
   });
 
   /** Increments `generation` on every write so the renderer detects refines. */
@@ -222,11 +252,40 @@ export class AgentStore {
 
   setAuditResult(summary: string, issues: AuditIssue[]): void {
     this.auditSummary.set(summary);
-    this.auditIssues.set(issues);
+    this.auditIssues.set(dedupeIssueIds(issues));
   }
 
   dismissAuditIssue(issueId: string): void {
     this.auditIssues.update((list) => list.filter((i) => i.id !== issueId));
+  }
+
+  /** Merge per-widget confidence scores from an auditor pass, keyed by target. */
+  setWidgetConfidence(list: readonly WidgetConfidence[]): void {
+    this.widgetConfidence.update((map) => {
+      const next = { ...map };
+      for (const entry of list) {
+        next[entry.targetId] = entry;
+      }
+      return next;
+    });
+  }
+
+  getWidgetConfidence(id: SpecialistId): WidgetConfidence | undefined {
+    return this.widgetConfidence()[id];
+  }
+
+  /**
+   * Drop a widget's confidence score. Used after a manual refine so the badge
+   * doesn't keep showing the previous content's (now stale) quality signal
+   * until the next audit regenerates it.
+   */
+  clearWidgetConfidence(id: SpecialistId): void {
+    this.widgetConfidence.update((map) => {
+      if (!(id in map)) return map;
+      const next = { ...map };
+      delete next[id];
+      return next;
+    });
   }
 
   clearAuditIssuesForTarget(targetId: WidgetEntry['id']): void {
@@ -260,6 +319,7 @@ export class AgentStore {
     this.plannerRationale.set(null);
     this.auditIssues.set([]);
     this.auditSummary.set(null);
+    this.widgetConfidence.set({});
     this.lastUserIntent.set(null);
     this.runWallStartedAt.set(Date.now());
     this.runWallEndedAt.set(null);

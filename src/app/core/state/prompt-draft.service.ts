@@ -1,11 +1,11 @@
-import { Injectable, signal } from '@angular/core';
+import { Service, signal } from '@angular/core';
 
 /**
  * Carrier signal that lets the Guide page (or any other navigator) seed the
  * Command Center's prompt textarea via `?try=...` query params without tightly
  * coupling the pages.
  */
-@Injectable({ providedIn: 'root' })
+@Service()
 export class PromptDraftService {
   readonly draft = signal<string>('');
 

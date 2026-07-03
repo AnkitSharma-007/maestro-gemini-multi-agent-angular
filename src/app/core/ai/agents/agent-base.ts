@@ -8,7 +8,7 @@ import type {
   ThinkingLevel as SdkThinkingLevel,
 } from '@google/genai';
 import { loadGenaiSdk } from '../genai-loader';
-import { toAppError } from '../../errors/app-error';
+import { isAbortError, toAppError } from '../../errors/app-error';
 import { usageFromMetadata } from '../gemini-pricing';
 import { buildRefinePrompt } from '../gemini.prompts';
 import { ApiKeyService } from '../../auth/api-key.service';
@@ -105,7 +105,15 @@ export abstract class AgentBase {
     } catch (err) {
       const usage = usageFromMetadata(lastUsage);
       if (usage) this.store.recordAgentUsage(this.id, usage, model);
-      this.store.setAgentStatus(this.id, 'error', toAppError(err));
+      // A cancelled request (a newer run/refine took over, or the key was
+      // cleared) is not a real failure. Reset to idle instead of surfacing a
+      // spurious "Request cancelled" error shell, and so globalStatus never
+      // gets wedged in a busy/error state by benign cancellations.
+      if (opts.signal?.aborted || isAbortError(err)) {
+        this.store.setAgentStatus(this.id, 'idle');
+      } else {
+        this.store.setAgentStatus(this.id, 'error', toAppError(err));
+      }
       throw err;
     }
   }

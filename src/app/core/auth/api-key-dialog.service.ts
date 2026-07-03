@@ -1,7 +1,7 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class ApiKeyDialogService {
   private readonly dialog = inject(MatDialog);
 

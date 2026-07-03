@@ -34,6 +34,8 @@ The three specialists run **in parallel** under `Promise.allSettled`, so one fai
 - **Generative UI** — `WIDGET_REGISTRY` maps each specialist to a lazy `import()`; `WidgetSlot` instantiates the component through `ViewContainerRef` and updates it in place via `setInput()`. Outputs are real, editable Angular components, not a transcript.
 - **Cross-widget ripple** — changing Schedule or Venue marks Budget stale with a one-click **Update**; Auditor fix-its cascade through dependent agents, then re-audit.
 - **Per-widget refine bars** — ask for surgical edits ("cut A/V cost by 25%", "swap to an outdoor venue") and only the owning specialist re-runs.
+- **Confidence scoring & opt-out auto-repair** — the Auditor scores each widget's quality; widgets below the threshold can be auto-repaired after a run (one extra generation + re-audit per widget, on your own key). It's **on by default, toggleable from the Control Tower** (persisted), and every repair announces its before → after confidence so the extra spend is visible.
+- **Multimodal brief intake** — draft a brief by dictating (Web Speech API) or attaching an image/PDF that Gemini reads into an editable prompt before you run.
 - **Google-Search grounding** — Schedule and Venue surface real `groundingMetadata` citations as source chips with `rel="noopener noreferrer"`.
 - **Friendly, centralized errors** — failures map to a sanitized `AppError` (auth, quota, network, invalid-model, …) shown as a toast or an inline retry shell; raw API text never reaches the UI.
 - **BYOK by design** — your Gemini key is validated against `models.list`, stored only in `localStorage`, masked in the UI (`••••abcd`), and never sent to any server we operate.
@@ -42,7 +44,7 @@ The three specialists run **in parallel** under `Promise.allSettled`, so one fai
 
 ## Quick start
 
-**Prerequisites:** Node 22.22+ (or 24.15+) · npm 8+ · a Gemini API key from [Google AI Studio](https://aistudio.google.com/apikey) (free tier works).
+**Prerequisites:** Node 22.22+ (or 24.15+) · npm 8+ · a Gemini API key from [Google AI Studio](https://aistudio.google.com/apikey) (free tier works). The minimum Node version is enforced via `engines`, and an `.nvmrc` is provided (`nvm use`).
 
 ```bash
 npm install
@@ -64,7 +66,8 @@ No `.env` needed — the app prompts for your Gemini key on first run and keeps 
 ```bash
 npm start                  # dev server
 npm run build              # production build (~129 kB gzip initial transfer)
-npm test -- --watch=false  # one-shot unit run (99 tests across 11 files)
+npm test -- --watch=false  # one-shot unit run (142 tests across 16 files)
+npm run lint               # ESLint (angular-eslint) over TS + templates
 npm run watch              # dev-config build with watch (no serve)
 ```
 
@@ -73,7 +76,7 @@ npm run watch              # dev-config build with watch (no serve)
 Pure SPA: drop `dist/maestro/browser/` on any static host (Vercel, Netlify, Cloudflare Pages, S3+CloudFront, GitHub Pages…). Configure two things:
 
 1. **SPA fallback** — serve `index.html` for unknown paths so `/architect?try=…` deep-links don't 404.
-2. **CSP** — the strict policy in `index.html` already whitelists `https://generativelanguage.googleapis.com` and the Google Fonts origins; extend `script-src` if your host adds origins.
+2. **CSP** — the strict policy in `index.html` uses `script-src 'self'` (no `'unsafe-inline'`; the anti-FOUC theme script is self-hosted in `public/theme-init.js`) and whitelists `https://generativelanguage.googleapis.com` for `connect-src` plus the Google Fonts origins for fonts/styles. `style-src` keeps `'unsafe-inline'` for Angular Material. Extend the relevant directive if your host adds origins.
 
 ---
 
@@ -152,7 +155,8 @@ src/
     ├── core/                       Pure logic, no DOM
     │   ├── ai/
     │   │   ├── agents/             planner · auditor · budget · schedule · venue · base
-    │   │   ├── agent-orchestrator.service.ts   Run / refine / fix-it / ripple / re-audit / retry
+    │   │   ├── intake/             Multimodal brief intake (image/PDF → editable brief)
+    │   │   ├── agent-orchestrator.service.ts   Run / refine / fix-it / ripple / re-audit / retry / self-heal
     │   │   ├── gemini.schemas.ts   Structured-output JSON schemas per agent
     │   │   ├── gemini.prompts.ts   System prompts and brief templates
     │   │   ├── gemini-pricing.ts   USD list prices for cost estimates
@@ -162,9 +166,11 @@ src/
     │   ├── auth/                   BYOK: validate() against models.list + connect-key dialog
     │   ├── errors/
     │   │   ├── app-error.ts               toAppError() + sanitized AppError model
-    │   │   ├── notification.service.ts    MatSnackBar wrapper (@Service)
+    │   │   ├── notification.service.ts    MatSnackBar wrapper
     │   │   └── global-error-handler.ts    App-wide ErrorHandler → friendly toast
     │   ├── demo/                   HERO_PROMPT + curated try-this briefs
+    │   ├── format/                 Safe formatters (e.g. currency-code normalization)
+    │   ├── settings/               Persisted user prefs (auto-repair opt-out)
     │   ├── state/                  Signal store + query-param → textarea hand-off
     │   ├── theme/                  Light/dark, persisted, prefers-color-scheme aware
     │   └── types/                  Discriminated unions, SPECIALIST_META, widget configs
@@ -191,7 +197,8 @@ src/
 | UI kit    | **Angular Material 22**                | Form fields, button toggles, progress bars, snackbars, violet theme.                          |
 | Styles    | **SCSS + design-system mixins**        | `glass-surface`, `pill`, `tinted-pill`, breakpoints — DRY source, same emitted CSS.           |
 | Routing   | **Standalone routes + lazy loading**   | Pages, the API-key dialog, the SDK, and every widget are lazy chunks.                         |
-| Tests     | **Vitest 4** (`jsdom`)                 | 99 tests across 11 files: schemas, agents, store, error mapping, pricing, telemetry, theme.   |
+| Tests     | **Vitest 4** (`jsdom`)                 | 142 tests across 16 files: schemas, agents, store, error mapping, pricing, telemetry, settings. |
+| Lint      | **angular-eslint 22** (flat config)    | `typescript-eslint` + Angular template rules incl. accessibility; `npm run lint`.             |
 | Build     | **Angular esbuild (`@angular/build`)** | Fast production builds; per-component-style budget at 14 kB warn / 20 kB error.               |
 
 ---
@@ -200,7 +207,8 @@ src/
 
 - **Initial transfer ~129 kB gzip** (549 kB raw). The heavy pieces load on demand: `@google/genai` (~45 kB gzip, first API call), the workspace page, the API-key dialog, and each widget.
 - **Performance** — lazy SDK/dialog/widgets/pages keep first paint lean; the Material Symbols font is subsetted to the glyphs actually used; the Control Tower ticker runs at 500 ms and pauses when the tab is hidden; every Gemini stream is tied to an `AbortController`.
-- **Security** — strict CSP in `index.html` (`connect-src` limited to `generativelanguage.googleapis.com`, plus `object-src 'none'`, `frame-ancestors 'none'`, `base-uri 'self'`); `rel="noopener noreferrer"` on external links; no analytics or third-party scripts; the API key is never logged, is masked in the UI, and is wiped on clear.
+- **Security** — strict CSP in `index.html` (`script-src 'self'` with no `'unsafe-inline'`; `connect-src` limited to `generativelanguage.googleapis.com`, plus `object-src 'none'`, `frame-ancestors 'none'`, `base-uri 'self'`); `rel="noopener noreferrer"` on external links; no analytics or third-party scripts; the API key is never logged, is masked in the UI, and is wiped on clear. (The key lives in `localStorage` as a deliberate BYOK/no-backend trade-off.)
+- **Multimodal intake privacy** — attached images/PDFs are read in-browser and sent (base64-inline) only to the Gemini API on your own key, exactly like a typed brief. Voice input uses the browser's built-in Web Speech API; note that in Chromium browsers this streams audio to the browser vendor's speech service (a browser-level behavior outside the app's CSP), so it is opt-in.
 
 ---
 
@@ -211,8 +219,8 @@ npm test -- --watch=false
 ```
 
 ```
- Test Files  11 passed (11)
-      Tests  99 passed (99)
+ Test Files  16 passed (16)
+      Tests  142 passed (142)
 ```
 
-Specs cover the structured-output schemas, agent streaming + tolerant JSON parsing, store mutations and audit lifecycle, error mapping (`toAppError`) and classification, BYOK validation, ripple builders, pricing math, and telemetry formatting.
+Specs cover the structured-output schemas, agent streaming + tolerant JSON parsing, store mutations and audit lifecycle (incl. issue-id de-dup and confidence clearing), error mapping (`toAppError`) and classification, BYOK validation, ripple builders, pricing math, telemetry formatting, settings persistence, currency normalization, and the self-heal/intake flows.

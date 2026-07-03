@@ -83,7 +83,7 @@ const COPY: Record<AppErrorKind, Omit<AppError, 'kind' | 'detail'>> = {
   },
 };
 
-function isAbortError(err: unknown): boolean {
+export function isAbortError(err: unknown): boolean {
   if (typeof DOMException !== 'undefined' && err instanceof DOMException) {
     return err.name === 'AbortError';
   }

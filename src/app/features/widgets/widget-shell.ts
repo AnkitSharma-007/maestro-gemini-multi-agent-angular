@@ -2,6 +2,7 @@ import {
   ChangeDetectorRef,
   Component,
   computed,
+  DestroyRef,
   effect,
   inject,
   input,
@@ -44,6 +45,7 @@ export class WidgetShell {
   private readonly orchestrator = inject(AgentOrchestrator);
   private readonly notifications = inject(NotificationService);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly mode = input.required<ShellMode>();
   readonly widgetId = input.required<SpecialistId>();
@@ -66,6 +68,56 @@ export class WidgetShell {
   protected readonly appError = computed(
     () => this.store.agentStates()[this.widgetId()].error ?? null,
   );
+
+  /**
+   * A widget that already rendered but whose latest refine/ripple/self-heal
+   * failed: keep the previous content visible, but surface the failure inline
+   * (otherwise it silently keeps a "Done" pill on stale data).
+   */
+  protected readonly hasInlineError = computed(
+    () => this.mode() === 'real' && this.status() === 'error' && !!this.appError(),
+  );
+
+  protected readonly confidence = computed(() =>
+    this.store.getWidgetConfidence(this.widgetId()),
+  );
+
+  protected readonly confidenceTier = computed<'high' | 'medium' | 'low' | null>(() => {
+    const c = this.confidence();
+    if (!c) return null;
+    if (c.confidence >= 0.8) return 'high';
+    if (c.confidence >= 0.6) return 'medium';
+    return 'low';
+  });
+
+  protected readonly confidencePct = computed(() => {
+    const c = this.confidence();
+    return c ? Math.round(c.confidence * 100) : null;
+  });
+
+  protected readonly confidenceIcon = computed(() => {
+    switch (this.confidenceTier()) {
+      case 'high':
+        return 'verified';
+      case 'medium':
+        return 'insights';
+      case 'low':
+        return 'auto_fix_high';
+      default:
+        return '';
+    }
+  });
+
+  protected readonly confidenceTooltip = computed(() => {
+    const c = this.confidence();
+    if (!c) return '';
+    const weaknesses = c.weaknesses.filter((w) => w.trim().length > 0);
+    const head = `Quality confidence: ${Math.round(c.confidence * 100)}%`;
+    return weaknesses.length ? `${head}\n• ${weaknesses.join('\n• ')}` : head;
+  });
+
+  /** Any pipeline activity — a ripple update now would abort in-flight work. */
+  protected readonly busy = this.store.isBusy;
 
   protected readonly canRetry = computed(
     () =>
@@ -94,6 +146,10 @@ export class WidgetShell {
       this.isStale();
       this.cdr.markForCheck();
     });
+
+    this.destroyRef.onDestroy(() => {
+      if (this.pulseTimer) clearTimeout(this.pulseTimer);
+    });
   }
 
   private firePulse(): void {
@@ -103,7 +159,7 @@ export class WidgetShell {
   }
 
   protected async updateFromRipple(): Promise<void> {
-    if (this.isStreaming()) return;
+    if (this.busy()) return;
     try {
       await this.orchestrator.rippleUpdate(this.widgetId());
     } catch (err) {

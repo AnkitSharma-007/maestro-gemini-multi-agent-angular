@@ -9,6 +9,7 @@ import { formatCostUsd, formatTokenCount } from '../../core/ai/telemetry-format'
 import { toAppError } from '../../core/errors/app-error';
 import { NotificationService } from '../../core/errors/notification.service';
 import { AgentStore } from '../../core/state/agent.store';
+import { SettingsService } from '../../core/settings/settings.service';
 import type { AgentTelemetry } from '../../core/types/telemetry.types';
 import {
   AgentId,
@@ -67,6 +68,9 @@ export class ControlTower {
   private readonly store = inject(AgentStore);
   private readonly orchestrator = inject(AgentOrchestrator);
   private readonly notifications = inject(NotificationService);
+  private readonly settings = inject(SettingsService);
+
+  protected readonly autoHeal = this.settings.autoHeal;
 
   /** Bumps every 500ms while any agent is active and the tab is visible. */
   private readonly liveTick = signal(0);
@@ -122,6 +126,10 @@ export class ControlTower {
       }, 500);
       onCleanup(() => clearInterval(handle));
     });
+  }
+
+  protected toggleAutoHeal(): void {
+    this.settings.toggleAutoHeal();
   }
 
   protected statusLabel(s: AgentStatus): string {

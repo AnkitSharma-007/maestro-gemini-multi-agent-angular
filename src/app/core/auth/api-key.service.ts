@@ -1,4 +1,4 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Service, signal } from '@angular/core';
 import { loadGenaiSdk } from '../ai/genai-loader';
 import { extractGeminiErrorMessage } from '../errors/app-error';
 import { NotificationService } from '../errors/notification.service';
@@ -45,7 +45,7 @@ const safeRemove = (storageKey: string): void => {
   }
 };
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class ApiKeyService {
   private readonly notifications = inject(NotificationService);
 

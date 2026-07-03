@@ -127,6 +127,53 @@ describe('AgentStore', () => {
       store.setAgentStatus('budget', 'done');
       expect(store.globalStatus()).toBe('done');
     });
+
+    it('reports "error" when the planner succeeded but every specialist failed', () => {
+      store.setAgentStatus('planner', 'done');
+      store.setAgentStatus('budget', 'error', {
+        kind: 'unknown',
+        title: 't',
+        message: 'm',
+        retryable: true,
+      });
+      store.setAgentStatus('schedule', 'error', {
+        kind: 'unknown',
+        title: 't',
+        message: 'm',
+        retryable: true,
+      });
+      store.setAgentStatus('venue', 'error', {
+        kind: 'unknown',
+        title: 't',
+        message: 'm',
+        retryable: true,
+      });
+      expect(store.globalStatus()).toBe('error');
+      expect(store.hasFailures()).toBe(true);
+    });
+
+    it('keeps "done" for partial success (one specialist done, one errored)', () => {
+      store.setAgentStatus('planner', 'done');
+      store.setAgentStatus('budget', 'done');
+      store.setAgentStatus('venue', 'error', {
+        kind: 'unknown',
+        title: 't',
+        message: 'm',
+        retryable: true,
+      });
+      expect(store.globalStatus()).toBe('done');
+      expect(store.hasFailures()).toBe(true);
+    });
+
+    it('reports "error" when the planner itself failed', () => {
+      store.setAgentStatus('planner', 'error', {
+        kind: 'unknown',
+        title: 't',
+        message: 'm',
+        retryable: true,
+      });
+      expect(store.globalStatus()).toBe('error');
+    });
   });
 
   describe('telemetry', () => {
@@ -207,6 +254,61 @@ describe('AgentStore', () => {
       ]);
       store.dismissAuditIssue('a');
       expect(store.auditIssues().map((i) => i.id)).toEqual(['b']);
+    });
+
+    it('deduplicates model-generated ids so @for track never collides', () => {
+      store.setAuditResult('x', [
+        { id: 'dup', targetId: 'budget', severity: 'warning', message: 'm1', autoBrief: 'b1' },
+        { id: 'dup', targetId: 'venue', severity: 'info', message: 'm2', autoBrief: 'b2' },
+        { id: 'dup', targetId: 'schedule', severity: 'info', message: 'm3', autoBrief: 'b3' },
+      ]);
+      const ids = store.auditIssues().map((i) => i.id);
+      expect(new Set(ids).size).toBe(3);
+      expect(ids).toEqual(['dup', 'dup-2', 'dup-3']);
+    });
+
+    it('backfills a stable id for blank ids', () => {
+      store.setAuditResult('x', [
+        { id: '', targetId: 'budget', severity: 'warning', message: 'm1', autoBrief: 'b1' },
+        { id: '   ', targetId: 'venue', severity: 'info', message: 'm2', autoBrief: 'b2' },
+      ]);
+      const ids = store.auditIssues().map((i) => i.id);
+      expect(new Set(ids).size).toBe(2);
+      expect(ids.every((id) => id.length > 0)).toBe(true);
+    });
+  });
+
+  describe('widget confidence', () => {
+    it('sets and reads per-widget confidence keyed by target', () => {
+      store.setWidgetConfidence([
+        { targetId: 'budget', confidence: 0.9, weaknesses: [] },
+        { targetId: 'venue', confidence: 0.4, weaknesses: ['too small'] },
+      ]);
+      expect(store.getWidgetConfidence('budget')?.confidence).toBe(0.9);
+      expect(store.getWidgetConfidence('venue')?.weaknesses).toEqual(['too small']);
+      expect(store.getWidgetConfidence('schedule')).toBeUndefined();
+    });
+
+    it('merges later assessments over earlier ones', () => {
+      store.setWidgetConfidence([{ targetId: 'budget', confidence: 0.4, weaknesses: ['w'] }]);
+      store.setWidgetConfidence([{ targetId: 'budget', confidence: 0.85, weaknesses: [] }]);
+      expect(store.getWidgetConfidence('budget')?.confidence).toBe(0.85);
+    });
+
+    it('is cleared by resetForRun', () => {
+      store.setWidgetConfidence([{ targetId: 'budget', confidence: 0.4, weaknesses: [] }]);
+      store.resetForRun();
+      expect(store.getWidgetConfidence('budget')).toBeUndefined();
+    });
+
+    it('clearWidgetConfidence drops only the target widget', () => {
+      store.setWidgetConfidence([
+        { targetId: 'budget', confidence: 0.5, weaknesses: ['w'] },
+        { targetId: 'venue', confidence: 0.9, weaknesses: [] },
+      ]);
+      store.clearWidgetConfidence('budget');
+      expect(store.getWidgetConfidence('budget')).toBeUndefined();
+      expect(store.getWidgetConfidence('venue')?.confidence).toBe(0.9);
     });
   });
 

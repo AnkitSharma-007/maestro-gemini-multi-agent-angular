@@ -56,9 +56,19 @@ export interface AuditIssue {
   autoBrief: string;
 }
 
+/** Per-widget quality signal produced by the Auditor's evaluation pass. */
+export interface WidgetConfidence {
+  targetId: SpecialistId;
+  /** Normalized 0..1 quality score. */
+  confidence: number;
+  /** Up to a few short, concrete weaknesses; empty when the output is strong. */
+  weaknesses: string[];
+}
+
 export interface AuditorOutput {
   summary: string;
   issues: AuditIssue[];
+  confidence?: WidgetConfidence[];
 }
 
 export class MissingApiKeyError extends Error {
