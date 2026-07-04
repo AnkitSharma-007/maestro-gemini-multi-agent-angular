@@ -1,0 +1,102 @@
+@use 'mixins' as m;
+
+:host {
+  display: block;
+}
+
+.demo-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  @include m.glass-surface($shadow: var(--dea-shadow-1), $blur: 14px, $saturate: 120%);
+  // Accent-tinted edge marks this as the demo chrome (no new gradient — §10.2 budget).
+  border-color: m.blend(var(--dea-accent), 40%, var(--dea-border));
+  transition: border-color var(--duration-base) var(--ease-standard);
+
+  // When the run finishes, shift the chrome to a calm "done" state.
+  &.is-complete {
+    border-color: m.blend(var(--dea-success), 40%, var(--dea-border));
+
+    .demo-badge {
+      background: m.tint(var(--dea-success), 14%);
+
+      mat-icon {
+        color: var(--dea-success);
+      }
+    }
+  }
+}
+
+.demo-lede {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.demo-badge {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--dea-radius-md);
+  background: m.tint(var(--dea-accent), 14%);
+
+  mat-icon {
+    color: var(--dea-accent);
+    @include m.sized-icon(20);
+  }
+}
+
+.demo-copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+
+  strong {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: var(--dea-fg);
+  }
+
+  span {
+    font-size: var(--text-xs);
+    color: var(--dea-fg-muted);
+  }
+}
+
+.demo-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.demo-btn-ghost {
+  @include m.button-ghost;
+}
+
+.demo-btn-secondary {
+  @include m.button-secondary;
+}
+
+.demo-btn-primary {
+  @include m.button-primary;
+}
+
+@include m.mobile {
+  .demo-banner {
+    align-items: flex-start;
+    padding: var(--space-3);
+  }
+
+  .demo-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}

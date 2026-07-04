@@ -9,21 +9,25 @@
     </div>
     <div class="head-right">
       <button
-        mat-icon-button
         type="button"
+        role="switch"
         class="heal-toggle"
         [class.on]="autoHeal()"
         (click)="toggleAutoHeal()"
         [matTooltip]="
           autoHeal()
-            ? 'Auto-repair low-confidence widgets: On (uses extra Gemini calls)'
-            : 'Auto-repair low-confidence widgets: Off'
+            ? 'Auto-repair low-confidence widgets is On — uses extra Gemini calls'
+            : 'Auto-repair low-confidence widgets is Off'
         "
         matTooltipPosition="below"
-        [attr.aria-pressed]="autoHeal()"
-        aria-label="Toggle auto-repair of low-confidence widgets"
+        [attr.aria-checked]="autoHeal()"
+        aria-label="Auto-repair low-confidence widgets"
       >
-        <mat-icon>auto_fix_high</mat-icon>
+        <mat-icon aria-hidden="true">auto_fix_high</mat-icon>
+        <span class="heal-label">Auto-repair</span>
+        <span class="heal-switch" aria-hidden="true">
+          <span class="heal-knob"></span>
+        </span>
       </button>
       <span class="state-pill state-{{ globalStatus() }}">
         {{ globalStatus() | uppercase }}

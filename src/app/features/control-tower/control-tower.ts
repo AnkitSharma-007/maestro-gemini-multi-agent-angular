@@ -5,6 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { AgentOrchestrator } from '../../core/ai/agent-orchestrator.service';
+import { DemoModeService } from '../../core/demo/demo-mode.service';
 import { formatCostUsd, formatTokenCount } from '../../core/ai/telemetry-format';
 import { toAppError } from '../../core/errors/app-error';
 import { NotificationService } from '../../core/errors/notification.service';
@@ -69,6 +70,7 @@ export class ControlTower {
   private readonly orchestrator = inject(AgentOrchestrator);
   private readonly notifications = inject(NotificationService);
   private readonly settings = inject(SettingsService);
+  private readonly demo = inject(DemoModeService);
 
   protected readonly autoHeal = this.settings.autoHeal;
 
@@ -95,6 +97,7 @@ export class ControlTower {
       const canRetry =
         state.status === 'error' &&
         !this.store.isBusy() &&
+        !this.demo.active() &&
         (id === 'auditor' ||
           id === 'planner' ||
           !!this.store.getAgentBrief(id));
@@ -157,6 +160,7 @@ export class ControlTower {
   }
 
   protected async retry(id: AgentId): Promise<void> {
+    if (this.demo.active()) return;
     try {
       await this.orchestrator.retryAgent(id);
     } catch (err) {

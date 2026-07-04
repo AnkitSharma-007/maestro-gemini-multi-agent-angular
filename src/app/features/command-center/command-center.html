@@ -33,7 +33,7 @@
       ></textarea>
     </mat-form-field>
 
-    @if (!isBusy()) {
+    @if (!isBusy() && !demoActive()) {
       <div class="intake-row" aria-label="Start from voice or a file">
         @if (voiceSupported) {
           <button
@@ -84,7 +84,7 @@
       </div>
     }
 
-    @if (!isBusy() && samplePrompts.length) {
+    @if (!isBusy() && !demoActive() && samplePrompts.length) {
       <div class="samples" aria-label="Sample prompts">
         <span class="samples-label">
           <mat-icon aria-hidden="true">bolt</mat-icon>
@@ -134,7 +134,7 @@
         }
       </span>
       <div class="action-buttons">
-        @if (prompt().length > 0 && !isBusy()) {
+        @if (prompt().length > 0 && !isBusy() && !demoActive()) {
           <button
             type="button"
             mat-button

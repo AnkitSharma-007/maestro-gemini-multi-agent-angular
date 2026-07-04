@@ -28,22 +28,31 @@
             <mat-icon>rocket_launch</mat-icon>
             <span>Try the demo brief</span>
           </a>
+          <a mat-stroked-button class="cta-secondary" [routerLink]="['/architect']">
+            <mat-icon>arrow_forward</mat-icon>
+            <span>Open the workspace</span>
+          </a>
         } @else {
-          <button
+          <a
             mat-flat-button
             color="primary"
-            type="button"
             class="cta-primary"
+            [routerLink]="['/architect']"
+            [queryParams]="{ demo: 1 }"
+          >
+            <mat-icon>play_circle</mat-icon>
+            <span>Watch a sample run</span>
+          </a>
+          <button
+            mat-stroked-button
+            type="button"
+            class="cta-secondary"
             (click)="openKeyDialog()"
           >
             <mat-icon>key</mat-icon>
-            <span>Connect a Gemini key to start</span>
+            <span>Connect a Gemini key</span>
           </button>
         }
-        <a mat-stroked-button class="cta-secondary" [routerLink]="['/architect']">
-          <mat-icon>arrow_forward</mat-icon>
-          <span>Open the workspace</span>
-        </a>
       </div>
       <p class="hero-foot">
         <mat-icon aria-hidden="true">shield_lock</mat-icon>
@@ -251,9 +260,14 @@
           <mat-icon>key</mat-icon>
           <span>Connect Gemini key</span>
         </button>
-        <a mat-stroked-button class="cta-secondary" [routerLink]="['/architect']">
-          <mat-icon>arrow_forward</mat-icon>
-          <span>Open the workspace</span>
+        <a
+          mat-stroked-button
+          class="cta-secondary"
+          [routerLink]="['/architect']"
+          [queryParams]="{ demo: 1 }"
+        >
+          <mat-icon>play_circle</mat-icon>
+          <span>Watch a sample run</span>
         </a>
       }
     </div>

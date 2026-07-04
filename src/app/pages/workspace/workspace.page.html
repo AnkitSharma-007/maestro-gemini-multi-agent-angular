@@ -1,6 +1,10 @@
-@if (!hasKey()) {
+@if (!hasKey() && !demoActive()) {
   <dea-no-key-empty-state />
 } @else {
+  @if (demoActive()) {
+    <dea-demo-banner />
+  }
+
   <div class="layout-grid" [class.is-active]="hasContent() || isBusy()">
     <div class="cc-col">
       <dea-command-center />

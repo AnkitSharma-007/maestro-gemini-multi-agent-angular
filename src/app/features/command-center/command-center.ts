@@ -15,6 +15,7 @@ import {
 import { ApiKeyService } from '../../core/auth/api-key.service';
 import { toAppError } from '../../core/errors/app-error';
 import { NotificationService } from '../../core/errors/notification.service';
+import { DemoModeService } from '../../core/demo/demo-mode.service';
 import { AgentStore } from '../../core/state/agent.store';
 import { PromptDraftService } from '../../core/state/prompt-draft.service';
 import {
@@ -77,6 +78,7 @@ export class CommandCenter {
   private readonly store = inject(AgentStore);
   private readonly notifications = inject(NotificationService);
   private readonly drafts = inject(PromptDraftService);
+  private readonly demo = inject(DemoModeService);
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly prompt = signal<string>('');
@@ -87,6 +89,8 @@ export class CommandCenter {
   protected readonly hasKey = this.apiKeys.hasKey;
   protected readonly globalStatus = this.store.globalStatus;
   protected readonly isBusy = this.store.isBusy;
+  /** Keyless sample run owns the store — all authoring/dispatch is locked. */
+  protected readonly demoActive = this.demo.active;
 
   protected readonly interpreting = signal<boolean>(false);
   protected readonly attachmentName = signal<string | null>(null);
@@ -102,7 +106,7 @@ export class CommandCenter {
    */
   protected readonly promptField = form(this.prompt, (p) => {
     maxLength(p, this.maxPromptChars);
-    disabled(p, { when: () => this.isBusy() });
+    disabled(p, { when: () => this.isBusy() || this.demoActive() });
   });
 
   private recognition: SpeechRecognitionLike | null = null;
@@ -117,6 +121,7 @@ export class CommandCenter {
     () =>
       this.hasKey() &&
       !this.isBusy() &&
+      !this.demoActive() &&
       !this.interpreting() &&
       !this.overLimit() &&
       this.prompt().trim().length > 0,
@@ -135,17 +140,17 @@ export class CommandCenter {
   }
 
   protected applyHero(): void {
-    if (this.isBusy()) return;
+    if (this.isBusy() || this.demoActive()) return;
     this.prompt.set(this.heroPrompt);
   }
 
   protected applySample(sample: SamplePrompt): void {
-    if (this.isBusy()) return;
+    if (this.isBusy() || this.demoActive()) return;
     this.prompt.set(sample.prompt);
   }
 
   protected clearPrompt(): void {
-    if (this.isBusy()) return;
+    if (this.isBusy() || this.demoActive()) return;
     this.prompt.set('');
   }
 
@@ -176,7 +181,7 @@ export class CommandCenter {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     input.value = ''; // allow re-selecting the same file
-    if (!file || this.isBusy() || this.interpreting()) return;
+    if (!file || this.isBusy() || this.demoActive() || this.interpreting()) return;
 
     this.attachmentName.set(file.name);
     this.interpreting.set(true);
@@ -208,7 +213,7 @@ export class CommandCenter {
   }
 
   private startVoice(): void {
-    if (this.isBusy() || this.interpreting()) return;
+    if (this.isBusy() || this.demoActive() || this.interpreting()) return;
     const Ctor = speechRecognitionCtor();
     if (!Ctor) {
       this.notifications.info(

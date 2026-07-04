@@ -4,6 +4,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { AgentOrchestrator } from '../../core/ai/agent-orchestrator.service';
+import { DemoModeService } from '../../core/demo/demo-mode.service';
 import { toAppError } from '../../core/errors/app-error';
 import { NotificationService } from '../../core/errors/notification.service';
 import { AgentStore } from '../../core/state/agent.store';
@@ -30,9 +31,17 @@ export class AuditRibbon {
   private readonly store = inject(AgentStore);
   private readonly orchestrator = inject(AgentOrchestrator);
   private readonly notifications = inject(NotificationService);
+  private readonly demo = inject(DemoModeService);
 
   /** Any pipeline activity — applying a fix or re-auditing now would abort it. */
   protected readonly busy = this.store.isBusy;
+  /** The keyless sample run is read-only — fixes/re-audits are locked. */
+  protected readonly demoActive = this.demo.active;
+
+  /** Re-audit (any variant) requires an idle pipeline and a real (non-demo) run. */
+  protected readonly canReAudit = computed(
+    () => !this.busy() && !this.demoActive(),
+  );
 
   protected readonly auditorStatus = computed(
     () => this.store.agentStates().auditor.status,
@@ -87,7 +96,7 @@ export class AuditRibbon {
   }
 
   protected canApply(issue: AuditIssue): boolean {
-    return !this.busy() && !this.isTargetBusy(issue.targetId);
+    return !this.busy() && !this.demoActive() && !this.isTargetBusy(issue.targetId);
   }
 
   protected async applyFix(issue: AuditIssue): Promise<void> {
@@ -108,7 +117,7 @@ export class AuditRibbon {
   }
 
   protected async reAudit(): Promise<void> {
-    if (this.busy()) return;
+    if (!this.canReAudit()) return;
     try {
       await this.orchestrator.reAudit();
     } catch (err) {

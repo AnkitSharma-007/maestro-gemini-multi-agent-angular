@@ -16,6 +16,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { AgentOrchestrator } from '../../core/ai/agent-orchestrator.service';
+import { DemoModeService } from '../../core/demo/demo-mode.service';
 import { toAppError } from '../../core/errors/app-error';
 import { NotificationService } from '../../core/errors/notification.service';
 import { AgentStore } from '../../core/state/agent.store';
@@ -39,6 +40,7 @@ export class RefineBar {
   private readonly orchestrator = inject(AgentOrchestrator);
   private readonly store = inject(AgentStore);
   private readonly notifications = inject(NotificationService);
+  private readonly demo = inject(DemoModeService);
 
   readonly widgetId = input.required<SpecialistId>();
 
@@ -68,11 +70,16 @@ export class RefineBar {
 
   /** Any pipeline activity anywhere — refining now would abort in-flight work. */
   protected readonly busy = this.store.isBusy;
+  /** The keyless sample run is read-only — no refine reaches the orchestrator. */
+  protected readonly demoActive = this.demo.active;
 
   /** Refine is unavailable while this widget or the pipeline is working. */
-  protected readonly disabled = computed(() => this.inFlight() || this.busy());
+  protected readonly disabled = computed(
+    () => this.inFlight() || this.busy() || this.demoActive(),
+  );
 
   protected readonly triggerTooltip = computed(() => {
+    if (this.demoActive()) return 'Sample run — connect your key to refine';
     if (this.inFlight()) return 'Agent is still working…';
     if (this.busy()) return 'Wait for the current run to finish';
     return 'Refine this widget';

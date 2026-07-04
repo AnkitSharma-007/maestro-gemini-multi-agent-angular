@@ -1,0 +1,46 @@
+<div
+  class="demo-banner"
+  [class.is-complete]="phase() === 'complete'"
+  role="status"
+  aria-live="polite"
+>
+  <div class="demo-lede">
+    <span class="demo-badge" aria-hidden="true">
+      <mat-icon>{{ phase() === 'complete' ? 'task_alt' : 'play_circle' }}</mat-icon>
+    </span>
+    <div class="demo-copy">
+      <strong>
+        @if (phase() === 'complete') {
+          That's a sample run
+        } @else {
+          Sample run · no key needed
+        }
+      </strong>
+      @if (phase() === 'complete') {
+        <span>Replay it, or connect your key to plan yours for real.</span>
+      } @else {
+        <span>Nothing is sent to Gemini — this is canned data, with no cost.</span>
+      }
+    </div>
+  </div>
+
+  <div class="demo-actions">
+    <button mat-button type="button" class="demo-btn-ghost" (click)="replay()">
+      <mat-icon aria-hidden="true">replay</mat-icon>
+      Replay
+    </button>
+    <button mat-stroked-button type="button" class="demo-btn-secondary" (click)="exit()">
+      Exit demo
+    </button>
+    <button
+      mat-flat-button
+      color="primary"
+      type="button"
+      class="demo-btn-primary"
+      (click)="connect()"
+    >
+      <mat-icon aria-hidden="true">link</mat-icon>
+      Connect your key
+    </button>
+  </div>
+</div>
