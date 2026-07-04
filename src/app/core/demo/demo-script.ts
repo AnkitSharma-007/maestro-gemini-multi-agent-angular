@@ -9,9 +9,9 @@ import type { DemoScheduler } from './demo-timeline';
 
 /**
  * Choreographs a scripted Maestro run by driving `AgentStore` the same way the
- * real `AgentOrchestrator` would (DEMO_MODE_IMPLEMENTATION_PLAN §3.4). It never
- * touches the network — it just sequences store mutations on the demo timeline,
- * so the existing workspace UI renders an identical run.
+ * real `AgentOrchestrator` would. It never touches the network — it just sequences
+ * store mutations on the demo timeline, so the existing workspace UI renders an
+ * identical run.
  *
  * The full story: planner → three staggered specialists → an auditor pass that
  * flags the budget (low confidence) → an auto **self-heal** that re-renders the

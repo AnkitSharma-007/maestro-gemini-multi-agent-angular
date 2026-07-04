@@ -10,9 +10,8 @@ export type DemoPhase = 'idle' | 'playing' | 'complete';
 const REDUCED_MOTION_SCALE = 0.12;
 
 /**
- * Owns the keyless "Watch a sample run" experience (UX_DESIGN_AUDIT §4.1 /
- * DEMO_MODE_IMPLEMENTATION_PLAN). It drives the real workspace UI from a scripted
- * replay of `AgentStore` — no Gemini call, no API key, no cost.
+ * Owns the keyless "Watch a sample run" experience. It drives the real workspace
+ * UI from a scripted replay of `AgentStore` — no Gemini call, no API key, no cost.
  *
  * `start()` clears the store, lazy-loads the canned run + choreography (so neither
  * lands in the initial bundle), and plays the timeline against an `AbortController`

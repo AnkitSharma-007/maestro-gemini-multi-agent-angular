@@ -1,9 +1,8 @@
-// Stylelint config — Design System guardrail (see DESIGN_SYSTEM_MIGRATION_PLAN.md).
+// Stylelint config — Design System guardrail.
 //
-// Phase 8 (locked): the migration is complete and enforcement is hardened — the
-// suite now runs at ERROR severity, so any design-token drift (raw color / spacing /
-// radius / type literals) or standard-scss regression fails `npm run lint:styles`.
-// The violation baseline was burned down to zero across Phases 2–7 before the flip.
+// Enforcement runs at ERROR severity, so any design-token drift (raw color /
+// spacing / radius / type literals) or standard-scss regression fails
+// `npm run lint:styles`.
 module.exports = {
   extends: ['stylelint-config-standard-scss'],
   plugins: ['stylelint-declaration-strict-value'],

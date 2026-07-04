@@ -9,11 +9,10 @@ import type {
 import { HERO_PROMPT } from './sample-prompts';
 
 /**
- * Canned data for the keyless "Watch a sample run" demo (see
- * DEMO_MODE_IMPLEMENTATION_PLAN §3.4 / §6). This is a faithful, hand-authored
- * replay of a real Maestro run for `HERO_PROMPT` — the exact shapes the live
- * agents would return, so it flows through `intoComponentConfig` and the real
- * widgets untouched. Nothing here ever hits the network.
+ * Canned data for the keyless "Watch a sample run" demo. This is a faithful,
+ * hand-authored replay of a real Maestro run for `HERO_PROMPT` — the exact shapes
+ * the live agents would return, so it flows through `intoComponentConfig` and the
+ * real widgets untouched. Nothing here ever hits the network.
  *
  * The Budget deliberately ships with a rebalancing weakness (A/V high,
  * contingency low) so the scripted auditor can flag it and the self-heal beat

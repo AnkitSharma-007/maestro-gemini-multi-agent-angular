@@ -1,6 +1,6 @@
 /**
- * Tiny cancelable scheduler for the demo replay (DEMO_MODE_IMPLEMENTATION_PLAN
- * §3.2). It is deliberately framework-free so it is trivial to unit test:
+ * Tiny cancelable scheduler for the demo replay. It is deliberately framework-free
+ * so it is trivial to unit test:
  *
  *  - `sleep()` resolves after a delay, rejects with `DemoAbortedError` on abort,
  *    and — crucially — *pauses while the tab is hidden* so a backgrounded demo

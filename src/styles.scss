@@ -18,8 +18,8 @@ html {
 
   // =========================================================================
   // DESIGN TOKENS (dark / default) — single source of truth.
-  // See DESIGN_SYSTEM_MIGRATION_PLAN.md for the token conventions ("use tokens,
-  // not magic numbers"), the full target architecture, and the phase log.
+  // Convention: use tokens, not magic numbers (raw color / spacing / radius /
+  // type literals are rejected by `npm run lint:styles`).
   // Groups: Surfaces · Borders · Text · Accent · Status · Radius · Elevation ·
   //   Motion · Spacing · Z-index · Accessibility · Typography · Gradients ·
   //   Background layers. (Light-theme overrides mirror this block below.)
