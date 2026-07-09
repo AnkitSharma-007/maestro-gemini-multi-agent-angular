@@ -60,6 +60,7 @@ dea-widget-shell {
 .head {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: var(--space-3);
   padding: var(--space-4) var(--space-5) var(--space-4);
   border-bottom: 1px solid var(--dea-border);
@@ -93,7 +94,13 @@ dea-widget-shell {
 }
 
 .title {
-  flex: 1;
+  // The title shares the header with the type badge and status/confidence
+  // pills, which are collectively too wide for a narrow (3-up) card. Give the
+  // title its own full-width row below the meta pills so it never collapses to
+  // a one-word-per-line column.
+  order: 1;
+  flex: 1 1 100%;
+  min-width: 0;
   margin: 0;
   font-size: var(--text-lg);
   font-weight: var(--weight-semibold);
@@ -373,17 +380,10 @@ dea-widget-shell {
   .head {
     padding: var(--space-3) var(--space-4) var(--space-3);
     gap: var(--space-2);
-    flex-wrap: wrap;
   }
 
   .title {
     font-size: var(--text-md);
-    flex: 1 1 100%;
-    order: 3;
-  }
-
-  .status-pill {
-    margin-left: auto;
   }
 
   .body {
