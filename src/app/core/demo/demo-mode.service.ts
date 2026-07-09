@@ -10,6 +10,13 @@ export type DemoPhase = 'idle' | 'playing' | 'complete';
 const REDUCED_MOTION_SCALE = 0.12;
 
 /**
+ * Beat between seeding the brief and spinning up the agents. It lets the Command
+ * Center render the "typed" brief first — as a real user would — so the input box
+ * is never populated mid-run while the agents are already working.
+ */
+const INTRO_BEAT_MS = 600;
+
+/**
  * Owns the keyless "Watch a sample run" experience. It drives the real workspace
  * UI from a scripted replay of `AgentStore` — no Gemini call, no API key, no cost.
  *
@@ -88,10 +95,13 @@ export class DemoModeService {
       // A late cancel (e.g. Exit clicked during the lazy import) short-circuits.
       if (controller.signal.aborted) return;
 
-      // Show the brief in the Command Center for realism.
+      // Show the brief in the Command Center first — as if the user typed it —
+      // and let it render before the agents start, so it never appears mid-run.
       this.drafts.set(DEMO_RUN.intent);
 
       const timeline = new DemoTimeline(this.speedScale(), controller.signal);
+      await timeline.wait(INTRO_BEAT_MS);
+
       await playDemoRun({
         store: this.store,
         data: DEMO_RUN,

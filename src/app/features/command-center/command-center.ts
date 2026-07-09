@@ -130,7 +130,10 @@ export class CommandCenter {
   constructor() {
     effect(() => {
       const draft = this.drafts.draft();
-      if (!draft || this.isBusy()) return;
+      // A real in-flight run must keep its brief untouched, but the keyless demo
+      // owns the store and deliberately prefills the brief as it starts (which
+      // immediately marks the store busy) — so don't block the demo's prefill.
+      if (!draft || (this.isBusy() && !this.demoActive())) return;
       this.prompt.set(draft);
       this.drafts.consume();
     });

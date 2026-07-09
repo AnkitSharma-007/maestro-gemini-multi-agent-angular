@@ -2,14 +2,14 @@
 
 [![Live demo](https://img.shields.io/badge/demo-live-6d4aff)](https://maestro-gemini-multi-agent-angular.vercel.app/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Angular 22](https://img.shields.io/badge/Angular-22-dd0031?logo=angular&logoColor=white)](https://angular.dev)
+[![Angular](https://img.shields.io/badge/Angular-dd0031?logo=angular&logoColor=white)](https://angular.dev)
 [![Gemini](https://img.shields.io/badge/Gemini-%40google%2Fgenai-8e75ff?logo=googlegemini&logoColor=white)](https://ai.google.dev/)
 
-**Live demo:** <https://maestro-gemini-multi-agent-angular.vercel.app/> · **Repo:** <https://github.com/AnkitSharma-007/maestro-gemini-multi-agent-angular>
+**Live demo:** <https://maestro-gemini-multi-agent-angular.vercel.app/>
 
 > **Five Gemini agents. One natural-language brief. A live, generative Angular dashboard, entirely in your browser.**
 
-Maestro turns a single sentence into a structured event plan rendered as live Angular widgets. It's a working reference for **multi-agent orchestration**, **generative UI**, and **bring-your-own-key** privacy on a static-SPA budget — no backend, no telemetry. Just Angular 22 (zoneless, signals), the `@google/genai` SDK, and a five-agent pipeline.
+Maestro turns a single sentence into a structured event plan rendered as live Angular widgets. It's a working reference for **multi-agent orchestration**, **generative UI**, and **bring-your-own-key** privacy on a static-SPA budget — no backend, no telemetry. Just Angular (zoneless, signals), the `@google/genai` SDK, and a five-agent pipeline.
 
 > _"Plan a 3-day, 800-attendee Agentic AI conference in Bengaluru this coming October, INR ₹2.5 crore budget, with hands-on workshops on multi-agent orchestration and a closing fireside."_
 >
@@ -52,7 +52,7 @@ The three specialists run **in parallel** under `Promise.allSettled`, so one fai
 
 ## Quick start
 
-**Prerequisites:** Node 22.22+ (or 24.15+) · npm 8+ · a Gemini API key from [Google AI Studio](https://aistudio.google.com/apikey) (free tier works). The minimum Node version is enforced via `engines`, and an `.nvmrc` is provided (`nvm use`).
+**Prerequisites:** Node (see `.nvmrc` / `engines`) · npm · a Gemini API key from [Google AI Studio](https://aistudio.google.com/apikey) (free tier works). Run `nvm use` to match the pinned Node version.
 
 ```bash
 npm install
@@ -190,15 +190,15 @@ src/
 
 | Layer     | Choice                                 | Why                                                                                           |
 | --------- | -------------------------------------- | --------------------------------------------------------------------------------------------- |
-| Framework | **Angular 22 zoneless**                | Smallest reactive surface; signals everywhere; OnPush default.                                |
+| Framework | **Angular zoneless**                   | Smallest reactive surface; signals everywhere; OnPush default.                                |
 | State     | **Signals + per-feature stores**       | Computed views; native cancellation via `AbortController`.                                    |
-| LLM SDK   | **`@google/genai` v2** (lazy)          | Structured outputs + streaming + Google Search grounding; lazy-loaded off the initial bundle.  |
-| UI kit    | **Angular Material 22**                | Form fields, button toggles, progress bars, snackbars, violet theme.                          |
+| LLM SDK   | **`@google/genai`** (lazy)             | Structured outputs + streaming + Google Search grounding; lazy-loaded off the initial bundle. |
+| UI kit    | **Angular Material**                   | Form fields, button toggles, progress bars, snackbars, violet theme.                          |
 | Styles    | **SCSS + design tokens + mixins**      | Tokens are the single source of truth; `glass-surface`/`pill` mixins keep it DRY.             |
 | Routing   | **Standalone routes + lazy loading**   | Pages, the API-key dialog, the SDK, the demo, and every widget are lazy chunks.               |
-| Tests     | **Vitest 4** (`jsdom`)                 | Unit specs for schemas, agents, store, errors, pricing, telemetry, settings, and the demo.     |
-| Lint      | **angular-eslint 22 + Stylelint 17**   | TS + template a11y rules (`npm run lint`); design-token guardrail (`npm run lint:styles`).     |
-| Build     | **Angular esbuild (`@angular/build`)** | Fast production builds; enforced initial-bundle + per-component-style budgets.                  |
+| Tests     | **Vitest** (`jsdom`)                   | Unit specs for schemas, agents, store, errors, pricing, telemetry, settings, and the demo.    |
+| Lint      | **angular-eslint + Stylelint**         | TS + template a11y rules (`npm run lint`); design-token guardrail (`npm run lint:styles`).    |
+| Build     | **Angular esbuild (`@angular/build`)** | Fast production builds; enforced initial-bundle + per-component-style budgets.                |
 
 ---
 
