@@ -1,10 +1,17 @@
 # Maestro
 
+[![Live demo](https://img.shields.io/badge/demo-live-6d4aff)](https://maestro-gemini-multi-agent-angular.vercel.app/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Angular 22](https://img.shields.io/badge/Angular-22-dd0031?logo=angular&logoColor=white)](https://angular.dev)
+[![Gemini](https://img.shields.io/badge/Gemini-%40google%2Fgenai-8e75ff?logo=googlegemini&logoColor=white)](https://ai.google.dev/)
+
+**Live demo:** <https://maestro-gemini-multi-agent-angular.vercel.app/> · **Repo:** <https://github.com/AnkitSharma-007/maestro-gemini-multi-agent-angular>
+
 > **Five Gemini agents. One natural-language brief. A live, generative Angular dashboard, entirely in your browser.**
 
 Maestro turns a single sentence into a structured event plan rendered as live Angular widgets. It's a working reference for **multi-agent orchestration**, **generative UI**, and **bring-your-own-key** privacy on a static-SPA budget — no backend, no telemetry. Just Angular 22 (zoneless, signals), the `@google/genai` SDK, and a five-agent pipeline.
 
-> _"Plan a 3-day, 1,200-attendee Agentic AI conference in Bengaluru in March 2026, INR ₹2.5 crore budget, with hands-on workshops and a closing fireside."_
+> _"Plan a 3-day, 1,200-attendee Agentic AI conference in Bengaluru in October 2026, INR ₹2.5 crore budget, with hands-on workshops on multi-agent orchestration and a closing fireside."_
 >
 > ↓ ~12 seconds later
 >

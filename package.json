@@ -1,6 +1,26 @@
 {
   "name": "maestro",
   "version": "0.0.0",
+  "description": "Maestro — a zoneless Angular + Gemini multi-agent app that turns one brief into a live, generative-UI event-planning dashboard. BYOK, no backend.",
+  "homepage": "https://maestro-gemini-multi-agent-angular.vercel.app/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AnkitSharma-007/maestro-gemini-multi-agent-angular.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AnkitSharma-007/maestro-gemini-multi-agent-angular/issues"
+  },
+  "keywords": [
+    "angular",
+    "gemini",
+    "multi-agent",
+    "generative-ui",
+    "ai-agents",
+    "agent-orchestration",
+    "byok",
+    "zoneless",
+    "signals"
+  ],
   "scripts": {
     "ng": "ng",
     "start": "ng serve",

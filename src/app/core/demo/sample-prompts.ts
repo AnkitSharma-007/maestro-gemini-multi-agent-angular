@@ -1,5 +1,5 @@
 export const HERO_PROMPT =
-  'Plan a 3-day, 1,200-attendee Agentic AI conference in Bengaluru in March 2026, INR ₹2.5 crore budget, with hands-on workshops on multi-agent orchestration and a closing fireside.';
+  'Plan a 3-day, 1,200-attendee Agentic AI conference in Bengaluru in October 2026, INR ₹2.5 crore budget, with hands-on workshops on multi-agent orchestration and a closing fireside.';
 
 export const LAUNCH_PROMPT =
   'Plan a 1-day product launch in San Francisco for 400 press and partners next April, USD $180k budget, with a 90-minute keynote, a hands-on demo lounge, and an evening rooftop reception.';

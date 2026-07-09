@@ -1,99 +1,60 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="Maestro  Multi-agent event planning with Gemini">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="Maestro &#8212; multi-agent event orchestration powered by Gemini">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#0a0a14"/>
-      <stop offset="100%" stop-color="#141632"/>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0a0a14"/>
+      <stop offset="1" stop-color="#141026"/>
     </linearGradient>
-    <radialGradient id="auroraA" cx="0.18" cy="0.22" r="0.55">
-      <stop offset="0%" stop-color="#b69aff" stop-opacity="0.55"/>
-      <stop offset="100%" stop-color="#b69aff" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="auroraB" cx="0.88" cy="0.28" r="0.55">
-      <stop offset="0%" stop-color="#6ee7f2" stop-opacity="0.42"/>
-      <stop offset="100%" stop-color="#6ee7f2" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="auroraC" cx="0.78" cy="0.92" r="0.6">
-      <stop offset="0%" stop-color="#ff9ad9" stop-opacity="0.34"/>
-      <stop offset="100%" stop-color="#ff9ad9" stop-opacity="0"/>
-    </radialGradient>
-    <linearGradient id="logoGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#b69aff"/>
-      <stop offset="55%" stop-color="#6ee7f2"/>
-      <stop offset="100%" stop-color="#ff9ad9"/>
+    <linearGradient id="brand" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#6d4aff"/>
+      <stop offset="1" stop-color="#c13ba8"/>
     </linearGradient>
-    <linearGradient id="textGrad" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#ffffff"/>
-      <stop offset="60%" stop-color="#e6e0ff"/>
-      <stop offset="100%" stop-color="#9adff0"/>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#6d4aff" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#6d4aff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.22"/>
+      <stop offset="0.5" stop-color="#ffffff" stop-opacity="0"/>
     </linearGradient>
-    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
-      <path d="M 48 0 L 0 0 0 48" fill="none" stroke="rgba(255,255,255,0.025)" stroke-width="1"/>
-    </pattern>
   </defs>
 
   <rect width="1200" height="630" fill="url(#bg)"/>
-  <rect width="1200" height="630" fill="url(#grid)"/>
-  <rect width="1200" height="630" fill="url(#auroraA)"/>
-  <rect width="1200" height="630" fill="url(#auroraB)"/>
-  <rect width="1200" height="630" fill="url(#auroraC)"/>
+  <ellipse cx="960" cy="140" rx="520" ry="420" fill="url(#glow)"/>
 
-  <!-- Logo tile -->
-  <g transform="translate(96, 96)">
-    <rect width="120" height="120" rx="28" fill="url(#logoGrad)"/>
-    <g fill="#ffffff" transform="translate(18, 18)">
-      <rect x="2"  y="30" width="11" height="36" rx="5"/>
-      <rect x="20" y="18" width="11" height="60" rx="5"/>
-      <rect x="38" y="6"  width="11" height="84" rx="5"/>
-      <rect x="56" y="18" width="11" height="60" rx="5"/>
-      <rect x="74" y="30" width="11" height="36" rx="5"/>
+  <!-- Brand mark: rounded tile with equalizer bars -->
+  <g transform="translate(96 96)">
+    <rect width="120" height="120" rx="26" fill="url(#brand)"/>
+    <rect width="120" height="120" rx="26" fill="url(#sheen)"/>
+    <g fill="#ffffff" transform="translate(18 18) scale(2.625)">
+      <rect x="5"  y="11" width="3" height="10" rx="1.5"/>
+      <rect x="10" y="8"  width="3" height="16" rx="1.5"/>
+      <rect x="15" y="5"  width="3" height="22" rx="1.5"/>
+      <rect x="20" y="8"  width="3" height="16" rx="1.5"/>
+      <rect x="25" y="11" width="3" height="10" rx="1.5"/>
     </g>
   </g>
 
-  <!-- Eyebrow chip -->
-  <g transform="translate(248, 130)">
-    <rect width="320" height="44" rx="22" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>
-    <circle cx="22" cy="22" r="5" fill="#5dd6a4"/>
-    <text x="40" y="29" fill="#ecedf3" font-family="Inter, system-ui, sans-serif" font-size="17" font-weight="500" letter-spacing="0.04em">MULTI-AGENT GENERATIVE UI · GEMINI</text>
-  </g>
+  <text x="240" y="150" font-family="Inter, 'Segoe UI', system-ui, sans-serif" font-size="76" font-weight="700" fill="#ffffff" letter-spacing="-1">Maestro</text>
+  <text x="242" y="196" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="24" font-weight="500" fill="#a99cff">multi-agent event orchestration &#183; powered by Gemini</text>
 
-  <!-- Wordmark -->
-  <text x="96" y="360" fill="url(#textGrad)" font-family="Inter, system-ui, sans-serif" font-size="180" font-weight="700" letter-spacing="-0.03em">Maestro</text>
+  <text x="96" y="368" font-family="Inter, 'Segoe UI', system-ui, sans-serif" font-size="58" font-weight="700" fill="#ffffff" letter-spacing="-1">One brief in.</text>
+  <text x="96" y="440" font-family="Inter, 'Segoe UI', system-ui, sans-serif" font-size="58" font-weight="700" letter-spacing="-1" xml:space="preserve"><tspan fill="#ffffff">A live, generative-UI </tspan><tspan fill="#c13ba8">dashboard</tspan><tspan fill="#ffffff"> out.</tspan></text>
 
-  <!-- Subhead -->
-  <text x="96" y="430" fill="#c8cde0" font-family="Inter, system-ui, sans-serif" font-size="36" font-weight="500" letter-spacing="-0.005em">
-    One sentence in.
-  </text>
-  <text x="96" y="478" fill="#9097ad" font-family="Inter, system-ui, sans-serif" font-size="30" font-weight="400">
-    A live event dashboard out  conducted by five Gemini agents.
-  </text>
+  <text x="96" y="510" font-family="Inter, 'Segoe UI', system-ui, sans-serif" font-size="28" font-weight="400" fill="#b9b6cc">Five cooperating Gemini agents &#183; zoneless Angular &#183; BYOK &#183; no backend</text>
 
-  <!-- Footer chips -->
-  <g transform="translate(96, 528)" font-family="Inter, system-ui, sans-serif" font-size="20" font-weight="500" fill="#ecedf3">
-    <g transform="translate(0, 0)">
-      <rect width="200" height="48" rx="14" fill="rgba(182,154,255,0.12)" stroke="rgba(182,154,255,0.35)"/>
-      <text x="20" y="31">Planner</text>
-      <circle cx="178" cy="24" r="4" fill="#b69aff"/>
+  <!-- Pill tags -->
+  <g font-family="'JetBrains Mono', ui-monospace, monospace" font-size="22" font-weight="500">
+    <g transform="translate(96 548)">
+      <rect width="196" height="46" rx="23" fill="none" stroke="#6d4aff" stroke-opacity="0.55" stroke-width="1.5"/>
+      <text x="98" y="30" text-anchor="middle" fill="#a99cff">multi-agent</text>
     </g>
-    <g transform="translate(216, 0)">
-      <rect width="232" height="48" rx="14" fill="rgba(110,231,242,0.12)" stroke="rgba(110,231,242,0.35)"/>
-      <text x="20" y="31">3 Specialists</text>
-      <circle cx="210" cy="24" r="4" fill="#6ee7f2"/>
+    <g transform="translate(312 548)">
+      <rect width="212" height="46" rx="23" fill="none" stroke="#6d4aff" stroke-opacity="0.55" stroke-width="1.5"/>
+      <text x="106" y="30" text-anchor="middle" fill="#a99cff">generative-ui</text>
     </g>
-    <g transform="translate(464, 0)">
-      <rect width="184" height="48" rx="14" fill="rgba(255,154,217,0.12)" stroke="rgba(255,154,217,0.35)"/>
-      <text x="20" y="31">Auditor</text>
-      <circle cx="162" cy="24" r="4" fill="#ff9ad9"/>
+    <g transform="translate(544 548)">
+      <rect width="132" height="46" rx="23" fill="none" stroke="#6d4aff" stroke-opacity="0.55" stroke-width="1.5"/>
+      <text x="66" y="30" text-anchor="middle" fill="#a99cff">angular</text>
     </g>
-    <g transform="translate(664, 0)">
-      <rect width="160" height="48" rx="14" fill="rgba(93,214,164,0.12)" stroke="rgba(93,214,164,0.35)"/>
-      <text x="20" y="31">BYOK</text>
-      <circle cx="138" cy="24" r="4" fill="#5dd6a4"/>
-    </g>
-  </g>
-
-  <!-- Top-right corner: tech stack -->
-  <g transform="translate(1104, 130)" text-anchor="end" font-family="Inter, system-ui, sans-serif">
-    <text x="0" y="0" fill="#9097ad" font-size="20" font-weight="500" letter-spacing="0.04em">ZONELESS · SIGNALS</text>
-    <text x="0" y="28" fill="#6a7088" font-size="18" font-weight="400">Angular 21 + Gemini</text>
   </g>
 </svg>
